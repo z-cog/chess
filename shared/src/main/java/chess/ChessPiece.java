@@ -65,18 +65,55 @@ public class ChessPiece {
                 break;
 
             case BISHOP:
-                for(int i = 1; i<=8; i++){
-                    if(((x-i) > 0) && ((y+i) <= 8)){
-                        moves.add(new ChessMove(myPosition, new ChessPosition(y+i, x-i), null));
+                boolean nw_blocked = false;
+                boolean ne_blocked = false;
+                boolean se_blocked = false;
+                boolean sw_blocked = false;
+
+                for(int i = 1; i<=8; i++) {
+                    if (((x - i) > 0) && ((y + i) < 9) && (!nw_blocked)) {
+                        ChessPosition nw = new ChessPosition(y + i, x - i);
+//                        if (board.getPiece(nw) == null) {
+                            moves.add(new ChessMove(myPosition, nw, null));
+//                        } else {
+//                            nw_blocked = true;
+//                            if(board.getPiece(nw).pieceColor != this.pieceColor){
+//                                moves.add(new ChessMove(myPosition, nw, null));
+//                            }
+//                        }
                     }
-                    if(((x+i) <= 8) && ((y+i) <= 8)){
-                        moves.add(new ChessMove(myPosition, new ChessPosition(y+i, x+i), null));
+                    if(((x+i) < 9) && ((y+i) < 9) && (!ne_blocked)){
+                        ChessPosition ne = new ChessPosition(y + i, x + i);
+//                        if (board.getPiece(ne) == null) {
+                            moves.add(new ChessMove(myPosition, ne, null));
+//                        } else {
+//                            ne_blocked = true;
+//                            if(board.getPiece(ne).pieceColor != this.pieceColor){
+//                                moves.add(new ChessMove(myPosition, ne, null));
+//                            }
+//                        }
                     }
-                    if(((x+i) <= 8) && ((y-i) > 0)){
-                        moves.add(new ChessMove(myPosition, new ChessPosition(y-i, x+i), null));
+                    if(((x+i) < 9) && ((y-i) > 0) && (!se_blocked)){
+                        ChessPosition se = new ChessPosition(y - i, x + i);
+//                        if (board.getPiece(se) == null) {
+                            moves.add(new ChessMove(myPosition, se, null));
+//                        } else {
+//                            se_blocked = true;
+//                            if(board.getPiece(se).pieceColor != this.pieceColor){
+//                                moves.add(new ChessMove(myPosition, se, null));
+//                            }
+//                        }
                     }
-                    if(((x-i) > 0) && ((y-i) > 0)){
-                        moves.add(new ChessMove(myPosition, new ChessPosition(y-i, x-i), null));
+                    if(((x-i) > 0) && ((y-i) > 0) && (!sw_blocked)){
+                        ChessPosition sw = new ChessPosition(y - i, x - i);
+//                        if (board.getPiece(sw) == null) {
+                            moves.add(new ChessMove(myPosition, sw, null));
+//                        } else {
+//                            sw_blocked = true;
+//                            if(board.getPiece(sw).pieceColor != this.pieceColor){
+//                                moves.add(new ChessMove(myPosition, sw, null));
+//                            }
+//                        }
                     }
                 }
                 break;
