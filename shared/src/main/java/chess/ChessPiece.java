@@ -55,6 +55,55 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         int x = myPosition.getColumn();
         int y = myPosition.getRow();
-        return new ArrayList<>();
+        ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
+        switch(this.type){
+            case KING:
+
+                break;
+
+            case QUEEN:
+                break;
+
+            case BISHOP:
+                for(int i = 1; i<=8; i++){
+                    if(((x-i) > 0) && ((y+i) <= 8)){
+                        moves.add(new ChessMove(myPosition, new ChessPosition(y+i, x-i), null));
+                    }
+                    if(((x+i) <= 8) && ((y+i) <= 8)){
+                        moves.add(new ChessMove(myPosition, new ChessPosition(y+i, x+i), null));
+                    }
+                    if(((x+i) <= 8) && ((y-i) > 0)){
+                        moves.add(new ChessMove(myPosition, new ChessPosition(y-i, x+i), null));
+                    }
+                    if(((x-i) > 0) && ((y-i) > 0)){
+                        moves.add(new ChessMove(myPosition, new ChessPosition(y-i, x-i), null));
+                    }
+                }
+                break;
+
+            case KNIGHT:
+                break;
+
+            case ROOK:
+                for(int i = 1; i <= 8; i++) {
+                    if(i != x){
+                        ChessPosition col_iter = new ChessPosition(y, i);
+                        moves.add(new ChessMove(myPosition, col_iter, null));
+                    }
+                    if(i != y){
+                        ChessPosition row_iter = new ChessPosition(i, x);
+                        moves.add(new ChessMove(myPosition, row_iter, null));
+                    }
+                }
+                break;
+
+            case PAWN:
+                break;
+
+            default:
+                break;
+
+        }
+        return moves;
     }
 }
