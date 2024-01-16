@@ -23,8 +23,9 @@ public class ChessMove {
 
     @Override
     public String toString(){
-        return "(" + this.startPosition + " -> " + this.endPosition + ")";
+        return "(" + this.endPosition + ")";
     }
+    //this.startPosition + " -> " +
 
     @Override
     public boolean equals(Object o) {

@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Objects;
 
 /**
@@ -15,9 +16,20 @@ public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
 
+    private HashMap<Integer, Boolean> dir_blocked; //for each direction, is there a path?
+    /*
+    7 0 1
+    6 % 2  % = the piece, and the numbers dictate direction.
+    5 4 3
+     */
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+        this.dir_blocked = new HashMap<Integer, Boolean>();
+        for(int i = 0; i < 8; i++){
+            this.dir_blocked.put(i, false);
+        }
     }
 
     /**
@@ -59,6 +71,66 @@ public class ChessPiece {
         return this.type;
     }
 
+    private void moveHelper(ChessPosition strt_pos, int dir, int dist, ChessBoard board, ArrayList<ChessMove> moves) {
+        int x = strt_pos.getColumn();
+        int y = strt_pos.getRow();
+
+        boolean logic = false; //if dir is invalid, then the move is invalid as well
+        ChessPosition end_pos = new ChessPosition(y,x); //If all else fails, it will try to move to its starting position
+        if(dir==0){ //North
+            logic = ((y + dist <= 8) && !this.dir_blocked.get(dir));
+            end_pos = new ChessPosition(y + dist, x);
+
+        }else if(dir==1){ //North-east
+            logic = ((y + dist <= 8) && (x + dist <= 8) && !this.dir_blocked.get(dir));
+            end_pos = new ChessPosition(y + dist, x + dist);
+
+
+        }else if(dir==2){ //East
+            logic = ((x + dist <= 8) && !this.dir_blocked.get(dir));
+            end_pos = new ChessPosition(y, x + dist);
+
+
+        }else if(dir==3){ //South-east
+            logic = ((x + dist <= 8) && (y - dist > 0) && !this.dir_blocked.get(dir));
+            end_pos = new ChessPosition(y - dist, x + dist);
+
+
+        }else if(dir==4){ //South
+            logic = ((y - dist > 0) && !this.dir_blocked.get(dir));
+            end_pos = new ChessPosition(y - dist, x);
+
+
+        }else if(dir==5){ //South-west
+            logic = ((x - dist > 0) && (y - dist > 0) && !this.dir_blocked.get(dir));
+            end_pos = new ChessPosition(y - dist, x - dist);
+
+
+        }else if(dir==6){ //West
+            logic = ((x - dist > 0) && !this.dir_blocked.get(dir));
+            end_pos = new ChessPosition(y, x - dist);
+
+
+        }else if(dir==7){ //North-west
+            logic = ((y + dist <= 8) && (x - dist > 0) && !this.dir_blocked.get(dir));
+            end_pos = new ChessPosition(y + dist, x - dist);
+
+
+        }
+
+
+        if(logic) {
+            if (board.getPiece(end_pos) == null) {
+                moves.add(new ChessMove(strt_pos, end_pos, null));
+            } else {
+                this.dir_blocked.replace(dir, true);
+                if(board.getPiece(end_pos).pieceColor != this.pieceColor){
+                    moves.add(new ChessMove(strt_pos, end_pos, null));
+                }
+            }
+        }
+    }
+
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -67,79 +139,32 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        int x = myPosition.getColumn();
-        int y = myPosition.getRow();
-
-        boolean nw_blocked = false;
-        boolean n_blocked = false;
-        boolean ne_blocked = false;
-        boolean e_blocked = false;
-        boolean se_blocked = false;
-        boolean s_blocked = false;
-        boolean sw_blocked = false;
-        boolean w_blocked = false;
+        for(int i = 0; i < 8; i++){
+            this.dir_blocked.replace(i, false);
+        }
 
         ArrayList<ChessMove> moves = new ArrayList<>();
 
         switch(this.type){
             case KING:
-
+                for(int i = 0; i < 8; i++) {
+                    moveHelper(myPosition, i, 1, board, moves);
+                }
                 break;
 
             case QUEEN:
+                for(int i = 1; i<=8; i++) {
+                    for(int j = 0; j<8; j++) { //Sets direction to all.
+                        moveHelper(myPosition, j, i, board, moves);
+                    }
+                }
                 break;
 
             case BISHOP:
                 for(int i = 1; i<=8; i++) {
-
-                    if (((x - i) > 0) && ((y + i) < 9) && (!nw_blocked)) {
-                        ChessPosition nw = new ChessPosition(y + i, x - i);
-                        if (board.getPiece(nw) == null) {
-                            moves.add(new ChessMove(myPosition, nw, null));
-                        } else {
-                            nw_blocked = true;
-                            if(board.getPiece(nw).pieceColor != this.pieceColor){
-                                moves.add(new ChessMove(myPosition, nw, null));
-                            }
-                        }
+                    for(int j = 1; j<8; j+=2) { //Sets direction to ne, se, sw, and nw
+                        moveHelper(myPosition, j, i, board, moves);
                     }
-
-                    if(((x+i) < 9) && ((y+i) < 9) && (!ne_blocked)){
-                        ChessPosition ne = new ChessPosition(y + i, x + i);
-                        if (board.getPiece(ne) == null) {
-                            moves.add(new ChessMove(myPosition, ne, null));
-                        } else {
-                            ne_blocked = true;
-                            if(board.getPiece(ne).pieceColor != this.pieceColor){
-                                moves.add(new ChessMove(myPosition, ne, null));
-                            }
-                        }
-                    }
-
-                    if(((x+i) < 9) && ((y-i) > 0) && (!se_blocked)){
-                        ChessPosition se = new ChessPosition(y - i, x + i);
-                        if (board.getPiece(se) == null) {
-                            moves.add(new ChessMove(myPosition, se, null));
-                        } else {
-                            se_blocked = true;
-                            if(board.getPiece(se).pieceColor != this.pieceColor){
-                                moves.add(new ChessMove(myPosition, se, null));
-                            }
-                        }
-                    }
-
-                    if(((x-i) > 0) && ((y-i) > 0) && (!sw_blocked)){
-                        ChessPosition sw = new ChessPosition(y - i, x - i);
-                        if (board.getPiece(sw) == null) {
-                            moves.add(new ChessMove(myPosition, sw, null));
-                        } else {
-                            sw_blocked = true;
-                            if(board.getPiece(sw).pieceColor != this.pieceColor){
-                                moves.add(new ChessMove(myPosition, sw, null));
-                            }
-                        }
-                    }
-
                 }
                 break;
 
@@ -147,14 +172,9 @@ public class ChessPiece {
                 break;
 
             case ROOK:
-                for(int i = 1; i <= 8; i++) {
-                    if(i != x){
-                        ChessPosition col_iter = new ChessPosition(y, i);
-                        moves.add(new ChessMove(myPosition, col_iter, null));
-                    }
-                    if(i != y){
-                        ChessPosition row_iter = new ChessPosition(i, x);
-                        moves.add(new ChessMove(myPosition, row_iter, null));
+                for(int i = 1; i<=8; i++) {
+                    for(int j = 0; j<8; j+=2) { //Sets direction to all.
+                        moveHelper(myPosition, j, i, board, moves);
                     }
                 }
                 break;
