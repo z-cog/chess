@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -31,6 +32,19 @@ public class ChessPiece {
         PAWN
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
+    }
+
     /**
      * @return Which team this chess piece belongs to
      */
@@ -55,7 +69,18 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         int x = myPosition.getColumn();
         int y = myPosition.getRow();
-        ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
+
+        boolean nw_blocked = false;
+        boolean n_blocked = false;
+        boolean ne_blocked = false;
+        boolean e_blocked = false;
+        boolean se_blocked = false;
+        boolean s_blocked = false;
+        boolean sw_blocked = false;
+        boolean w_blocked = false;
+
+        ArrayList<ChessMove> moves = new ArrayList<>();
+
         switch(this.type){
             case KING:
 
@@ -65,11 +90,6 @@ public class ChessPiece {
                 break;
 
             case BISHOP:
-                boolean nw_blocked = false;
-                boolean ne_blocked = false;
-                boolean se_blocked = false;
-                boolean sw_blocked = false;
-
                 for(int i = 1; i<=8; i++) {
 
                     if (((x - i) > 0) && ((y + i) < 9) && (!nw_blocked)) {
