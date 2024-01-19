@@ -13,7 +13,7 @@ public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
 
-    private HashMap<Integer, Boolean> dir_blocked; //for each direction, is there a path?
+    private final HashMap<Integer, Boolean> dir_blocked; //for each direction, is there a path?
     /*
     7 0 1
     6 % 2  % = the piece, and the numbers dictate direction.
@@ -23,7 +23,7 @@ public class ChessPiece {
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
-        this.dir_blocked = new HashMap<Integer, Boolean>();
+        this.dir_blocked = new HashMap<>();
         for(int i = 0; i < 8; i++){
             this.dir_blocked.put(i, false);
         }
@@ -247,107 +247,62 @@ public class ChessPiece {
                 break;
 
             case PAWN:
-                if(this.pieceColor == ChessGame.TeamColor.WHITE) {
-                    if(y + 1 < 9) {
-                        ChessPosition up = new ChessPosition(y+1, x);
-                        if (board.getPiece(up) == null) {
-                            if (y + 1 == 8) {
-                                moves.add(new ChessMove(myPosition, up, PieceType.QUEEN));
-                                moves.add(new ChessMove(myPosition, up, PieceType.BISHOP));
-                                moves.add(new ChessMove(myPosition, up, PieceType.KNIGHT));
-                                moves.add(new ChessMove(myPosition, up, PieceType.ROOK));
-
-                            } else {
-                                moves.add(new ChessMove(myPosition, up, null));
-                            }
-
-                            ChessPosition up_up = new ChessPosition(y + 2, x);
-                            if (y == 2 && board.getPiece(up_up) == null) {
-                                moves.add(new ChessMove(myPosition, up_up, null));
-                            }
-                        }
-
-                        if ((x - 1 > 0)) {
-                            ChessPosition up_left = new ChessPosition(y + 1, x - 1);
-                            if (board.getPiece(up_left) != null && board.getPiece(up_left).pieceColor != this.pieceColor) {
-                                if (y + 1 == 8) {
-                                    moves.add(new ChessMove(myPosition, up_left, PieceType.QUEEN));
-                                    moves.add(new ChessMove(myPosition, up_left, PieceType.BISHOP));
-                                    moves.add(new ChessMove(myPosition, up_left, PieceType.KNIGHT));
-                                    moves.add(new ChessMove(myPosition, up_left, PieceType.ROOK));
-
-                                } else {
-                                    moves.add(new ChessMove(myPosition, up_left, null));
-                                }
-                            }
-                        }
-
-                        if ((x + 1 > 9)) {
-                            ChessPosition up_right = new ChessPosition(y + 1, x + 1);
-                            if (board.getPiece(up_right) != null && board.getPiece(up_right).pieceColor != this.pieceColor) {
-                                if (y + 1 == 8) {
-                                    moves.add(new ChessMove(myPosition, up_right, PieceType.QUEEN));
-                                    moves.add(new ChessMove(myPosition, up_right, PieceType.BISHOP));
-                                    moves.add(new ChessMove(myPosition, up_right, PieceType.KNIGHT));
-                                    moves.add(new ChessMove(myPosition, up_right, PieceType.ROOK));
-
-                                } else {
-                                    moves.add(new ChessMove(myPosition, up_right, null));
-                                }
-                            }
-                        }
-                    }
+                int pawn_dir;
+                if(this.pieceColor == ChessGame.TeamColor.WHITE){
+                    pawn_dir = 1;
                 }else{
-                    if(y - 1 > 0) {
-                        ChessPosition down = new ChessPosition(y-1, x);
-                        if (board.getPiece(down) == null) {
-                            if (y - 1 == 1) {
-                                moves.add(new ChessMove(myPosition, down, PieceType.QUEEN));
-                                moves.add(new ChessMove(myPosition, down, PieceType.BISHOP));
-                                moves.add(new ChessMove(myPosition, down, PieceType.KNIGHT));
-                                moves.add(new ChessMove(myPosition, down, PieceType.ROOK));
+                    pawn_dir = -1;
+                }
+
+                    if((0 < y + pawn_dir) && (y + pawn_dir < 9)) {
+                        ChessPosition up_down = new ChessPosition(y+pawn_dir, x);
+                        if (board.getPiece(up_down) == null) {
+                            if ((y + pawn_dir == 8) || (y + pawn_dir == 1)) {
+                                moves.add(new ChessMove(myPosition, up_down, PieceType.QUEEN));
+                                moves.add(new ChessMove(myPosition, up_down, PieceType.BISHOP));
+                                moves.add(new ChessMove(myPosition, up_down, PieceType.KNIGHT));
+                                moves.add(new ChessMove(myPosition, up_down, PieceType.ROOK));
 
                             } else {
-                                moves.add(new ChessMove(myPosition, down, null));
+                                moves.add(new ChessMove(myPosition, up_down, null));
                             }
 
-                            ChessPosition down_down = new ChessPosition(y - 2, x);
-                            if (y == 7 && board.getPiece(down_down) == null) {
-                                moves.add(new ChessMove(myPosition, down_down, null));
+                            ChessPosition double_move = new ChessPosition(y + 2*pawn_dir, x);
+                            if (((y == 2 && pawn_dir == 1) || (y==7 && pawn_dir == -1))&& board.getPiece(double_move) == null) {
+                                moves.add(new ChessMove(myPosition, double_move, null));
                             }
                         }
 
                         if ((x - 1 > 0)) {
-                            ChessPosition down_left = new ChessPosition(y - 1, x - 1);
-                            if (board.getPiece(down_left) != null && board.getPiece(down_left).pieceColor != this.pieceColor) {
-                                if (y - 1 == 1) {
-                                    moves.add(new ChessMove(myPosition, down_left, PieceType.QUEEN));
-                                    moves.add(new ChessMove(myPosition, down_left, PieceType.BISHOP));
-                                    moves.add(new ChessMove(myPosition, down_left, PieceType.KNIGHT));
-                                    moves.add(new ChessMove(myPosition, down_left, PieceType.ROOK));
+                            ChessPosition left = new ChessPosition(y + pawn_dir, x - 1);
+                            if (board.getPiece(left) != null && board.getPiece(left).pieceColor != this.pieceColor) {
+                                if ((y + pawn_dir == 8) || (y + pawn_dir == 1)) {
+                                    moves.add(new ChessMove(myPosition, left, PieceType.QUEEN));
+                                    moves.add(new ChessMove(myPosition, left, PieceType.BISHOP));
+                                    moves.add(new ChessMove(myPosition, left, PieceType.KNIGHT));
+                                    moves.add(new ChessMove(myPosition, left, PieceType.ROOK));
 
                                 } else {
-                                    moves.add(new ChessMove(myPosition, down_left, null));
+                                    moves.add(new ChessMove(myPosition, left, null));
                                 }
                             }
                         }
 
-                        if ((x + 1 > 9)) {
-                            ChessPosition down_right = new ChessPosition(y - 1, x + 1);
-                            if (board.getPiece(down_right) != null && board.getPiece(down_right).pieceColor != this.pieceColor) {
-                                if (y - 1 == 1) {
-                                    moves.add(new ChessMove(myPosition, down_right, PieceType.QUEEN));
-                                    moves.add(new ChessMove(myPosition, down_right, PieceType.BISHOP));
-                                    moves.add(new ChessMove(myPosition, down_right, PieceType.KNIGHT));
-                                    moves.add(new ChessMove(myPosition, down_right, PieceType.ROOK));
+                        if ((x + 1 < 9)) {
+                            ChessPosition right = new ChessPosition(y + pawn_dir, x + 1);
+                            if (board.getPiece(right) != null && board.getPiece(right).pieceColor != this.pieceColor) {
+                                if ((y + pawn_dir == 8) || (y + pawn_dir == 1)) {
+                                    moves.add(new ChessMove(myPosition, right, PieceType.QUEEN));
+                                    moves.add(new ChessMove(myPosition, right, PieceType.BISHOP));
+                                    moves.add(new ChessMove(myPosition, right, PieceType.KNIGHT));
+                                    moves.add(new ChessMove(myPosition, right, PieceType.ROOK));
 
                                 } else {
-                                    moves.add(new ChessMove(myPosition, down_right, null));
+                                    moves.add(new ChessMove(myPosition, right, null));
                                 }
                             }
                         }
                     }
-                }
                 break;
 
             default:
