@@ -11,6 +11,8 @@ import java.util.Arrays;
 public class ChessBoard {
     private final ChessPiece[][] squares = new ChessPiece[8][8];
 
+    public ChessBoard() {    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -22,18 +24,6 @@ public class ChessBoard {
     @Override
     public int hashCode() {
         return Arrays.deepHashCode(squares);
-    }
-
-    public ChessBoard() {    }
-
-    /**
-     * Adds a chess piece to the chessboard
-     *
-     * @param position where to add the piece to
-     * @param piece    the piece to add
-     */
-    public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow() -1][position.getColumn()-1] = piece;
     }
 
     @Override
@@ -107,6 +97,16 @@ public class ChessBoard {
     }
 
     /**
+     * Adds a chess piece to the chessboard
+     *
+     * @param position where to add the piece to
+     * @param piece    the piece to add
+     */
+    public void addPiece(ChessPosition position, ChessPiece piece) {
+        squares[position.getRow() -1][position.getColumn()-1] = piece;
+    }
+
+    /**
      * Gets a chess piece on the chessboard
      *
      * @param position The position to get the piece from
@@ -115,6 +115,24 @@ public class ChessBoard {
      */
     public ChessPiece getPiece(ChessPosition position) {
         return squares[position.getRow()-1][position.getColumn()-1];
+    }
+
+    /**
+     * Given a move, moves a piece.
+     * note: checking for valid moves is done in ChessGame.
+     *
+     * @param move The move to make
+     */
+    public void movePiece(ChessMove move){
+        var piece = this.getPiece(move.getStartPosition());
+        if(piece != null){
+            this.addPiece(move.getStartPosition(), null);
+            if(move.getPromotionPiece() == null){
+                this.addPiece(move.getEndPosition(), piece);
+            }else{
+                this.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
+            }
+        }
     }
 
     /**
