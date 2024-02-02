@@ -1,7 +1,7 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 
 /**
@@ -14,9 +14,14 @@ public class ChessGame {
     private TeamColor turn;
     private ChessBoard board;
 
+    private final HashMap<TeamColor, ChessPosition> king_pos;
+
     public ChessGame() {
         turn = TeamColor.WHITE; //first turn is always white.
         board = new ChessBoard();
+        king_pos = new HashMap<>();
+        king_pos.put(TeamColor.WHITE, null);
+        king_pos.put(TeamColor.BLACK, null);
     }
 
     /**
@@ -43,10 +48,33 @@ public class ChessGame {
         BLACK
     }
 
+    private void findKings(){
+        for(int i = 1; i < 9; i++){
+            for(int j = 1; j < 9; j ++){
+                var piece = board.getPiece(new ChessPosition(i, j));
+                if(piece != null && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                    if (piece.getTeamColor() == TeamColor.WHITE) { //IntelliJ freaks out if I just put piece.getTeamColor() into the HashMap
+                        this.king_pos.put(TeamColor.WHITE, new ChessPosition(i, j));
+                    }else{
+                        this.king_pos.put(TeamColor.BLACK, new ChessPosition(i, j));
+                    }
+                }
+            }
+        }
+    }
+
     private Collection<ChessPosition> scanBoard(TeamColor teamColor){
         HashSet<ChessPosition> positions = new HashSet<>();
-
-
+        for(int i = 1; i < 9; i++){
+            for(int j = 1; j < 9; j ++){
+                var piece = board.getPiece(new ChessPosition(i, j));
+                if(piece != null){
+                    if(piece.getTeamColor() == teamColor){
+                        positions.add(new ChessPosition(i, j));
+                    }
+                }
+            }
+        }
         return positions;
     }
 
@@ -83,20 +111,17 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        ArrayList<ChessPosition> enemy_pos = new ArrayList<>();
-        ChessPosition king_pos = null;
-        for(int i = 1; i < 9; i++){
-            for(int j = 1; j < 9; j ++){
-                var piece = board.getPiece(new ChessPosition(i, j));
-                if(piece != null){
-                    if(piece.getTeamColor() != teamColor){
-                        enemy_pos.add(new ChessPosition(i, j));
-                    }else if(piece.getPieceType() == ChessPiece.PieceType.KING){
-                        king_pos = new ChessPosition(i, j);
-                    }
-                }
-            }
+        if(this.king_pos.get(teamColor) == null){
+            this.findKings();
         }
+        Collection<ChessPosition> enemy_pos;
+
+        if(teamColor == TeamColor.WHITE){
+            enemy_pos = this.scanBoard(TeamColor.BLACK);
+        }else{
+            enemy_pos = this.scanBoard(TeamColor.WHITE);
+        }
+        ChessPosition king_pos = this.king_pos.get(teamColor);
 
         if(!enemy_pos.isEmpty() && king_pos != null){
             for(var pos : enemy_pos){
@@ -127,7 +152,13 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+            var piece_pos = scanBoard(teamColor);
+            for(ChessPosition pos : piece_pos){
+                if(!validMoves(pos).isEmpty()){
+                    return false;
+                }
+            }
+            return true;
     }
 
     /**
