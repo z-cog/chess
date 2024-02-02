@@ -89,22 +89,19 @@ public class ChessGame {
         ChessPiece piece = board.getPiece(startPosition);
         if(piece != null) {
             var color = piece.getTeamColor();
-            if(color == getTeamTurn()) {
-                var valid_moves = new HashSet<ChessMove>();
-                var old_board = new ChessBoard(this.board);
-                var piece_moves = piece.pieceMoves(old_board, startPosition);
-                for (var move : piece_moves) {
+            var valid_moves = new HashSet<ChessMove>();
+            var old_board = new ChessBoard(this.board);
+            var piece_moves = piece.pieceMoves(old_board, startPosition);
+            for (var move : piece_moves) {
 //                    System.out.println(board);
-                    this.board.movePiece(move);
-                    if (!isInCheck(color)) {
-                        valid_moves.add(move);
-                    }
-                    this.setBoard(old_board);
+                this.board.movePiece(move);
+                if (!isInCheck(color)) {
+                    valid_moves.add(move);
                 }
-                return valid_moves;
-            }else{
-                return null;
+                this.setBoard(old_board);
             }
+            return valid_moves;
+
         }
         return null;
 
@@ -118,8 +115,12 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         var start = move.getStartPosition();
+        if(board.getPiece(start).getTeamColor() != getTeamTurn()){
+            throw new InvalidMoveException("It is not the pieces turn!");
+        }
         var valid_moves = validMoves(start);
         if(valid_moves != null && valid_moves.contains(move)){
+
             board.movePiece(move);
             if(getTeamTurn() == TeamColor.WHITE){
                 setTeamTurn(TeamColor.BLACK);
