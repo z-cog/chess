@@ -117,7 +117,7 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         var start = move.getStartPosition();
         if(validMoves(start).contains(move)){
-            var x = 5;
+            board.movePiece(move);
         }else{
             throw new InvalidMoveException("Move is invalid!");
         }
@@ -130,9 +130,8 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        if(this.king_pos.get(teamColor) == null){
-            this.findKings();
-        }
+        findKings();
+
         Collection<ChessPosition> enemy_pos;
 
         if(teamColor == TeamColor.WHITE){

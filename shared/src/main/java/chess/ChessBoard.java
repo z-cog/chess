@@ -9,12 +9,20 @@ import java.util.Arrays;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private ChessPiece[][] squares = new ChessPiece[8][8];
+    private final ChessPiece[][] squares = new ChessPiece[8][8];
 
     public ChessBoard() {    }
 
     public ChessBoard(ChessBoard other){
-        this.squares = other.squares;
+        for(int i = 1; i < 9; i++){
+            for(int j = 1; j < 9; j++){
+                ChessPosition pos = new ChessPosition(i,j);
+                ChessPiece piece = other.getPiece(pos);
+                if(piece != null){
+                    this.addPiece(pos, new ChessPiece(piece.getTeamColor(), piece.getPieceType()));
+                }
+            }
+        }
     }
 
     @Override
