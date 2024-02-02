@@ -9,9 +9,13 @@ import java.util.Arrays;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private final ChessPiece[][] squares = new ChessPiece[8][8];
+    private ChessPiece[][] squares = new ChessPiece[8][8];
 
     public ChessBoard() {    }
+
+    public ChessBoard(ChessBoard other){
+        this.squares = other.squares;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -103,7 +107,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow() -1][position.getColumn()-1] = piece;
+        squares[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
     /**
@@ -170,4 +174,5 @@ public class ChessBoard {
         this.addPiece(new ChessPosition(8, 8), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK));
 
     }
+
 }

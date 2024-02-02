@@ -93,9 +93,9 @@ public class ChessGame {
                 return piece.pieceMoves(board, startPosition);
             }else{
                 var valid_moves = new HashSet<ChessMove>();
-                var old_board = this.getBoard();
+                var old_board = new ChessBoard(this.board);
                 for(var move : piece.pieceMoves(old_board, startPosition)){
-                    board.movePiece(move);
+                    this.board.movePiece(move);
                     if(!isInCheck(color)){
                         valid_moves.add(move);
                     }
@@ -116,7 +116,7 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         var start = move.getStartPosition();
-        if(!validMoves(start).isEmpty()){
+        if(validMoves(start).contains(move)){
             var x = 5;
         }else{
             throw new InvalidMoveException("Move is invalid!");
