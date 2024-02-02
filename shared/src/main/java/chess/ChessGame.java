@@ -88,7 +88,21 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
         if(piece != null) {
-            return piece.pieceMoves(board, startPosition);
+            var color = piece.getTeamColor();
+            if(!isInCheck(color) && piece.getPieceType() != ChessPiece.PieceType.KING) {
+                return piece.pieceMoves(board, startPosition);
+            }else{
+                var valid_moves = new HashSet<ChessMove>();
+                var old_board = this.getBoard();
+                for(var move : piece.pieceMoves(old_board, startPosition)){
+                    board.movePiece(move);
+                    if(!isInCheck(color)){
+                        valid_moves.add(move);
+                    }
+                    this.setBoard(old_board);
+                }
+                return valid_moves;
+            }
         }
         return null;
 
@@ -101,7 +115,12 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        var start = move.getStartPosition();
+        if(!validMoves(start).isEmpty()){
+            var x = 5;
+        }else{
+            throw new InvalidMoveException("Move is invalid!");
+        }
     }
 
     /**
@@ -125,8 +144,9 @@ public class ChessGame {
 
         if(!enemy_pos.isEmpty() && king_pos != null){
             for(var pos : enemy_pos){
-                var valid_moves = validMoves(pos);
-                if(valid_moves.contains(new ChessMove(pos, king_pos, null))){
+                var possible_moves = board.getPiece(pos).pieceMoves(board, pos);
+                if(possible_moves.contains(new ChessMove(pos, king_pos, null))
+                || possible_moves.contains(new ChessMove(pos, king_pos, ChessPiece.PieceType.QUEEN))){ //pawns can always promote to a queen.
                     return true;
                 }
             }

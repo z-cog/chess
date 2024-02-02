@@ -124,7 +124,7 @@ public class ChessBoard {
      * @param move The move to make
      */
     public void movePiece(ChessMove move){
-        var piece = this.getPiece(move.getStartPosition());
+        var piece = getPiece(move.getStartPosition());
         if(piece != null){
             this.addPiece(move.getStartPosition(), null);
             if(move.getPromotionPiece() == null){
