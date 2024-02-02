@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -41,6 +43,13 @@ public class ChessGame {
         BLACK
     }
 
+    private Collection<ChessPosition> scanBoard(TeamColor teamColor){
+        HashSet<ChessPosition> positions = new HashSet<>();
+
+
+        return positions;
+    }
+
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -74,16 +83,26 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        ChessPiece king = null;
+        ArrayList<ChessPosition> enemy_pos = new ArrayList<>();
+        ChessPosition king_pos = null;
         for(int i = 1; i < 9; i++){
             for(int j = 1; j < 9; j ++){
                 var piece = board.getPiece(new ChessPosition(i, j));
                 if(piece != null){
                     if(piece.getTeamColor() != teamColor){
-                        
+                        enemy_pos.add(new ChessPosition(i, j));
                     }else if(piece.getPieceType() == ChessPiece.PieceType.KING){
-                        king = piece;
+                        king_pos = new ChessPosition(i, j);
                     }
+                }
+            }
+        }
+
+        if(!enemy_pos.isEmpty() && king_pos != null){
+            for(var pos : enemy_pos){
+                var valid_moves = validMoves(pos);
+                if(valid_moves.contains(new ChessMove(pos, king_pos, null))){
+                    return true;
                 }
             }
         }
@@ -97,7 +116,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return isInCheck(teamColor) && isInStalemate(teamColor);
     }
 
     /**
