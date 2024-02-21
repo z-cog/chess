@@ -6,12 +6,14 @@ import model.*;
 
 import java.util.Collection;
 
-public interface GameAccess {
+public interface GameDAO {
     GameData createGame(String gameName) throws DataAccessException;
 
     Collection<ChessGame> getGame(int gameID) throws DataAccessException;
 
-    void updatePlayer(ChessGame.TeamColor clientColor, GameData gameData) throws DataAccessException;
+    GameData updatePlayer(String username, ChessGame.TeamColor clientColor, GameData gameData);
 
-    void clearGames() throws DataAccessException;
+    void updateGame(GameData game) throws DataAccessException;
+
+    void clear() throws DataAccessException;
 }
