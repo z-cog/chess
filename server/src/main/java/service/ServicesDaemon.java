@@ -6,6 +6,8 @@ import dataAccess.GameDAO;
 import dataAccess.UserDAO;
 import model.*;
 
+import java.util.Objects;
+
 public class ServicesDaemon {
     private final AuthDAO auth;
     private final GameDAO games;
@@ -17,13 +19,28 @@ public class ServicesDaemon {
         this.user = user;
     }
 
-    public AuthData register(String username, String password, String email) throws Exception {
+    public String register(String username, String password, String email) throws BadRequestException, DataAccessException, UserTakenException {
+        if ((username.isEmpty()) || (password.isEmpty()) || (email.isEmpty())) {
+            throw new BadRequestException("Error: bad request");
+        }
         var oldUser = this.user.getUser(username);
         if (oldUser != null) {
             throw new UserTakenException("Error: already taken");
         } else {
-            var newUser = user.createUser(username, password, email);
-            return auth.createAuth(newUser);
+            UserData newUser = user.createUser(username, password, email);
+            return auth.createAuth(newUser).authToken();
+        }
+    }
+
+    public String login(String username, String password) throws BadRequestException, DataAccessException, UnauthorizedUserException {
+        if ((username.isEmpty()) || (password.isEmpty())) {
+            throw new BadRequestException("Error: bad request");
+        }
+        UserData currentUser = user.getUser(username);
+        if ((currentUser == null) || (!Objects.equals(currentUser.password(), password))) {
+            throw new UnauthorizedUserException("Error: unauthorized");
+        } else {
+            return auth.createAuth(currentUser).authToken();
         }
     }
 
