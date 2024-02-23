@@ -38,7 +38,7 @@ public class LoginTests {
     }
 
     @Test
-    public void wrongCredentials() {
+    public void loginWrongCredentials() {
         assertDoesNotThrow(() -> service.register("mike", "averystrongpassword", "yo@email.gov"));
 
         assertThrows(UnauthorizedUserException.class, () -> service.login("mike", "AStrongerPassword1234"));

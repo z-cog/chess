@@ -17,10 +17,6 @@ public class MemoryAuthDAO implements AuthDAO {
         return new_auth;
     }
 
-    public Boolean verifyPassword(String password, UserData user) {
-        return Objects.equals(user.password(), password);
-    }
-
     public AuthData getAuth(String authToken) throws DataAccessException {
         dataBaseTest();
         for (AuthData item : auth) {
@@ -31,14 +27,9 @@ public class MemoryAuthDAO implements AuthDAO {
         return null;
     }
 
-    public void removeAuth(String authToken) throws DataAccessException {
+    public void removeAuth(AuthData currentAuth) throws DataAccessException {
         dataBaseTest();
-        for (AuthData item : auth) {
-            if (Objects.equals(item.authToken(), authToken)) {
-                auth.remove(item);
-                break;
-            }
-        }
+        auth.remove(currentAuth);
     }
 
     public void clear() throws DataAccessException {

@@ -25,16 +25,6 @@ public class MemoryUserDAO implements UserDAO {
         return null;
     }
 
-    public void removeUser(String username) throws DataAccessException {
-        dataBaseTest();
-        for (var item : user) {
-            if (Objects.equals(item.username(), username)) {
-                user.remove(item);
-                break;
-            }
-        }
-    }
-
     public void clear() throws DataAccessException {
         dataBaseTest();
         user.clear();

@@ -44,6 +44,19 @@ public class ServicesDaemon {
         }
     }
 
+    public void logout(String authToken) throws BadRequestException, DataAccessException, UnauthorizedUserException {
+        if (authToken.isEmpty()) {
+            throw new BadRequestException("Error: bad request");
+        }
+
+        AuthData currentAuth = auth.getAuth(authToken);
+        if (currentAuth == null) {
+            throw new UnauthorizedUserException("Error: unauthorized");
+        } else {
+            auth.removeAuth(currentAuth);
+        }
+    }
+
     public void clear() throws DataAccessException {
         auth.clear();
         games.clear();
