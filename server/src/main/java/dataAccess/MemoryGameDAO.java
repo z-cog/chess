@@ -9,19 +9,30 @@ import java.util.Objects;
 
 public class MemoryGameDAO implements GameDAO {
     HashSet<GameData> games = new HashSet<>();
+    int currentID = 0;
 
     public GameData createGame(String gameName) throws DataAccessException {
         dataBaseTest();
-        return null;
+        var newGame = new GameData(currentID, "", "", gameName, new ChessGame());
+        this.games.add(newGame);
+        this.currentID += 1;
+        return newGame;
     }
 
-    public Collection<ChessGame> getGame(int gameID) throws DataAccessException {
+    public Collection<GameData> getGame(int gameID) throws DataAccessException {
         dataBaseTest();
-        return null;
-    }
-
-    public GameData updatePlayer(String username, ChessGame.TeamColor clientColor, GameData gameData) {
-        return null;
+        HashSet<GameData> listOfGames = new HashSet<>();
+        if (gameID == -1) {
+            listOfGames.addAll(games);
+        } else {
+            for (var item : games) {
+                if (Objects.equals(item.gameID(), gameID)) {
+                    listOfGames.add(item);
+                    break;
+                }
+            }
+        }
+        return listOfGames;
     }
 
     public void updateGame(GameData game) throws DataAccessException {
@@ -38,6 +49,7 @@ public class MemoryGameDAO implements GameDAO {
     public void clear() throws DataAccessException {
         dataBaseTest();
         games.clear();
+        this.currentID = 0;
     }
 
     private void dataBaseTest() throws DataAccessException {

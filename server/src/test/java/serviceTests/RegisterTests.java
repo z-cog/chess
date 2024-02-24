@@ -32,7 +32,6 @@ public class RegisterTests {
 
     @Test
     public void registerTakenUser() {
-
         assertDoesNotThrow(() -> service.register("bob", "bob1234", "bob@bob.bob"));
 
         //Fails, as username matches
