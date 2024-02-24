@@ -6,6 +6,7 @@ import dataAccess.GameDAO;
 import dataAccess.UserDAO;
 import model.*;
 
+import java.util.Collection;
 import java.util.Objects;
 
 public class ServicesDaemon {
@@ -54,6 +55,18 @@ public class ServicesDaemon {
             throw new UnauthorizedUserException("Error: unauthorized");
         } else {
             auth.removeAuth(currentAuth);
+        }
+    }
+
+    public Collection<GameData> listGames(String authToken) throws BadRequestException, DataAccessException, UnauthorizedUserException {
+        if (authToken.isEmpty()) {
+            throw new BadRequestException("Error: bad request");
+        }
+        AuthData currentAuth = auth.getAuth(authToken);
+        if (currentAuth == null) {
+            throw new UnauthorizedUserException("Error: unauthorized");
+        } else {
+            return games.getGame(-1);
         }
     }
 
