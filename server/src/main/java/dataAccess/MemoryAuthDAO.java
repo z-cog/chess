@@ -14,12 +14,6 @@ public class MemoryAuthDAO implements AuthDAO {
         dataBaseTest();
         AuthData newAuth = new AuthData(UUID.randomUUID().toString(), user.username());
         dataBaseTest();
-        for (AuthData item : auth) {
-            if (Objects.equals(item.username(), newAuth.username())) {
-                auth.remove(item);
-                break;
-            }
-        }
         auth.add(newAuth);
         return newAuth;
     }
