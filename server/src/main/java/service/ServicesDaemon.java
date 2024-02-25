@@ -32,7 +32,7 @@ public class ServicesDaemon {
     }
 
     public String register(String username, String password, String email) throws BadRequestException, DataAccessException, UserTakenException {
-        if ((username.isEmpty()) || (password.isEmpty()) || (email.isEmpty())) {
+        if (username == null || password == null || email == null || username.isEmpty() || password.isEmpty() || email.isEmpty()) {
             throw new BadRequestException("Error: bad request");
         }
         var oldUser = this.user.getUser(username);
@@ -45,7 +45,7 @@ public class ServicesDaemon {
     }
 
     public String login(String username, String password) throws BadRequestException, DataAccessException, UnauthorizedUserException {
-        if ((username.isEmpty()) || (password.isEmpty())) {
+        if (username == null || password == null || username.isEmpty() || password.isEmpty()) {
             throw new BadRequestException("Error: bad request");
         }
         UserData currentUser = user.getUser(username);
@@ -57,7 +57,7 @@ public class ServicesDaemon {
     }
 
     public void logout(String authToken) throws BadRequestException, DataAccessException, UnauthorizedUserException {
-        if (authToken.isEmpty()) {
+        if (authToken == null || authToken.isEmpty()) {
             throw new BadRequestException("Error: bad request");
         }
 
@@ -66,7 +66,7 @@ public class ServicesDaemon {
     }
 
     public Collection<GameData> listGames(String authToken) throws BadRequestException, DataAccessException, UnauthorizedUserException {
-        if (authToken.isEmpty()) {
+        if (authToken == null || authToken.isEmpty()) {
             throw new BadRequestException("Error: bad request");
         }
         checkAuth(authToken);
@@ -75,7 +75,7 @@ public class ServicesDaemon {
     }
 
     public int createGame(String authToken, String gameName) throws BadRequestException, DataAccessException, UnauthorizedUserException {
-        if (authToken.isEmpty()) {
+        if (authToken == null || authToken.isEmpty()) {
             throw new BadRequestException("Error: bad request");
         }
         checkAuth(authToken);
@@ -83,12 +83,12 @@ public class ServicesDaemon {
     }
 
     public void joinGame(String authToken, int gameID, ChessGame.TeamColor teamColor) throws BadRequestException, DataAccessException, UnauthorizedUserException, UserTakenException {
-        if (authToken.isEmpty()) {
+        if (authToken == null || authToken.isEmpty()) {
             throw new BadRequestException("Error: bad request");
         }
         AuthData authData = checkAuth(authToken);
         Collection<GameData> gameCollection = games.getGame(gameID);
-        if (gameCollection.isEmpty()) {
+        if (gameCollection == null || gameCollection.isEmpty()) {
             throw new BadRequestException("Error: bad request");
         }
 

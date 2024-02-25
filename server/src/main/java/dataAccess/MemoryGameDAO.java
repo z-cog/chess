@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class MemoryGameDAO implements GameDAO {
     HashSet<GameData> games = new HashSet<>();
-    int currentID = 0;
+    int currentID = 1;
 
     public int createGame(String gameName) throws DataAccessException {
         dataBaseTest();
@@ -49,7 +49,7 @@ public class MemoryGameDAO implements GameDAO {
     public void clear() throws DataAccessException {
         dataBaseTest();
         games.clear();
-        this.currentID = 0;
+        this.currentID = 1;
     }
 
     private void dataBaseTest() throws DataAccessException {
