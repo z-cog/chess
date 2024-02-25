@@ -1,10 +1,13 @@
 package service;
 
+import chess.ChessGame;
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
 import dataAccess.UserDAO;
-import model.*;
+import model.AuthData;
+import model.GameData;
+import model.UserData;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -18,6 +21,14 @@ public class ServicesDaemon {
         this.auth = auth;
         this.games = games;
         this.user = user;
+    }
+
+    private AuthData checkAuth(String authToken) throws DataAccessException, UnauthorizedUserException {
+        AuthData currentAuth = auth.getAuth(authToken);
+        if (currentAuth == null) {
+            throw new UnauthorizedUserException("Error: unauthorized");
+        }
+        return currentAuth;
     }
 
     public String register(String username, String password, String email) throws BadRequestException, DataAccessException, UserTakenException {
@@ -50,23 +61,48 @@ public class ServicesDaemon {
             throw new BadRequestException("Error: bad request");
         }
 
-        AuthData currentAuth = auth.getAuth(authToken);
-        if (currentAuth == null) {
-            throw new UnauthorizedUserException("Error: unauthorized");
-        } else {
-            auth.removeAuth(currentAuth);
-        }
+        AuthData currentAuth = checkAuth(authToken);
+        auth.removeAuth(currentAuth);
     }
 
     public Collection<GameData> listGames(String authToken) throws BadRequestException, DataAccessException, UnauthorizedUserException {
         if (authToken.isEmpty()) {
             throw new BadRequestException("Error: bad request");
         }
-        AuthData currentAuth = auth.getAuth(authToken);
-        if (currentAuth == null) {
-            throw new UnauthorizedUserException("Error: unauthorized");
-        } else {
-            return games.getGame(-1);
+        checkAuth(authToken);
+        return games.getGame(-1);
+
+    }
+
+    public int createGame(String authToken, String gameName) throws BadRequestException, DataAccessException, UnauthorizedUserException {
+        if (authToken.isEmpty()) {
+            throw new BadRequestException("Error: bad request");
+        }
+        checkAuth(authToken);
+        return games.createGame(gameName);
+    }
+
+    public void joinGame(String authToken, int gameID, ChessGame.TeamColor teamColor) throws BadRequestException, DataAccessException, UnauthorizedUserException, UserTakenException {
+        if (authToken.isEmpty()) {
+            throw new BadRequestException("Error: bad request");
+        }
+        AuthData authData = checkAuth(authToken);
+        Collection<GameData> gameCollection = games.getGame(gameID);
+        if (gameCollection.isEmpty()) {
+            throw new BadRequestException("Error: bad request");
+        }
+
+        GameData currentGame = (GameData) gameCollection.toArray()[0];
+        if (teamColor == ChessGame.TeamColor.WHITE) {
+            if (currentGame.whiteUsername() != null) {
+                throw new UserTakenException("Error: already taken");
+            }
+            games.updateGame(new GameData(gameID, authData.username(), currentGame.blackUsername(), currentGame.gameName(), currentGame.game()));
+        } else if (teamColor == ChessGame.TeamColor.BLACK) {
+            if (currentGame.blackUsername() != null) {
+                throw new UserTakenException("Error: already taken");
+            }
+            games.updateGame(new GameData(gameID, currentGame.whiteUsername(), authData.username(), currentGame.gameName(), currentGame.game()));
         }
     }
 

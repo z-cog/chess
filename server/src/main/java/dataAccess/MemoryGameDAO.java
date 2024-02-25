@@ -11,12 +11,12 @@ public class MemoryGameDAO implements GameDAO {
     HashSet<GameData> games = new HashSet<>();
     int currentID = 0;
 
-    public GameData createGame(String gameName) throws DataAccessException {
+    public int createGame(String gameName) throws DataAccessException {
         dataBaseTest();
-        var newGame = new GameData(currentID, "", "", gameName, new ChessGame());
+        var newGame = new GameData(currentID, null, null, gameName, new ChessGame());
         this.games.add(newGame);
         this.currentID += 1;
-        return newGame;
+        return newGame.gameID();
     }
 
     public Collection<GameData> getGame(int gameID) throws DataAccessException {

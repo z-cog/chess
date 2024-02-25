@@ -12,9 +12,16 @@ public class MemoryAuthDAO implements AuthDAO {
 
     public AuthData createAuth(UserData user) throws DataAccessException {
         dataBaseTest();
-        AuthData new_auth = new AuthData(UUID.randomUUID().toString(), user.username());
-        auth.add(new_auth);
-        return new_auth;
+        AuthData newAuth = new AuthData(UUID.randomUUID().toString(), user.username());
+        dataBaseTest();
+        for (AuthData item : auth) {
+            if (Objects.equals(item.username(), newAuth.username())) {
+                auth.remove(item);
+                break;
+            }
+        }
+        auth.add(newAuth);
+        return newAuth;
     }
 
     public AuthData getAuth(String authToken) throws DataAccessException {

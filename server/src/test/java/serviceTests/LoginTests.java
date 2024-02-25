@@ -48,4 +48,18 @@ public class LoginTests {
     public void loginBadRequest() {
         assertThrows(BadRequestException.class, () -> service.login("", ""));
     }
+
+    @Test
+    public void loginRemovesOldAuth() {
+        try {
+            String oldAuth = service.register("bob", "bob", "bob@bobmail.bob");
+            assertNotNull(auth.getAuth(oldAuth));
+
+            String newAuth = service.login("bob", "bob");
+            assertNotNull(auth.getAuth(newAuth));
+            assertNull(auth.getAuth(oldAuth));
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
 }
