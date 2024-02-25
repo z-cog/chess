@@ -1,7 +1,5 @@
 package dataAccess;
 
-
-import chess.ChessGame;
 import model.*;
 
 import java.util.Collection;
