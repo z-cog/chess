@@ -58,6 +58,13 @@ public class Server {
         return body;
     }
 
+    private String authHandler(Request request) throws UnauthorizedUserException {
+        if (request.headers() == null) {
+            throw new UnauthorizedUserException("Error: unauthorized");
+        }
+        return new Gson().fromJson(request.headers("authorization"), String.class);
+    }
+
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
@@ -84,21 +91,21 @@ public class Server {
     }
 
     private Object logout(Request request, Response response) throws BadRequestException, DataAccessException, UnauthorizedUserException {
-        var authToken = new Gson().fromJson(request.headers("authorization"), String.class);
+        String authToken = authHandler(request);
         service.logout(authToken);
         response.status(200);
         return "{}";
     }
 
     private Object listGames(Request request, Response response) throws BadRequestException, DataAccessException, UnauthorizedUserException {
-        var authToken = new Gson().fromJson(request.headers("authorization"), String.class);
+        String authToken = authHandler(request);
         var gamesList = service.listGames(authToken);
         response.status(200);
         return new Gson().toJson(Map.of("games", gamesList));
     }
 
     private Object createGame(Request request, Response response) throws BadRequestException, DataAccessException, UnauthorizedUserException {
-        var authToken = new Gson().fromJson(request.headers("authorization"), String.class);
+        String authToken = authHandler(request);
         var requestObject = new Gson().fromJson(request.body(), CreateGameRequest.class);
         int gameID = service.createGame(authToken, requestObject.gameName());
         response.status(200);
@@ -106,7 +113,7 @@ public class Server {
     }
 
     private Object joinGame(Request request, Response response) throws BadRequestException, DataAccessException, UnauthorizedUserException, UserTakenException {
-        var authToken = new Gson().fromJson(request.headers("authorization"), String.class);
+        String authToken = authHandler(request);
         var requestObject = new Gson().fromJson(request.body(), JoinGameRequest.class);
         service.joinGame(authToken, requestObject.gameID(), requestObject.playerColor());
         response.status(200);
