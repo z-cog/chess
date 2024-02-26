@@ -137,6 +137,86 @@ public class ChessPiece {
     }
 
     /**
+     * See above, but only for the knight.
+     *
+     * @param startPos where the piece begins.
+     * @param dir      direction the piece should go.
+     * @param board    the board (???).
+     * @param moves    set of valid moves.
+     */
+    private void knightMoveHelper(ChessPosition startPos, int dir, ChessBoard board, Collection<ChessMove> moves) {
+        int x = startPos.getColumn();
+        int y = startPos.getRow();
+        boolean logic;
+        ChessPosition endPos = switch (dir) {
+            case 0 -> {
+                logic = (y + 2 <= 8) && (x - 1 > 0) && !this.blocked.get(dir);
+                yield new ChessPosition(y + 2, x - 1);
+            }
+            case 1 -> {
+                logic = (y + 2 <= 8) && (x + 1 <= 8) && !this.blocked.get(dir);
+                yield new ChessPosition(y + 2, x + 1);
+            }
+            case 2 -> {
+                logic = (y + 1 <= 8) && (x + 2 <= 8) && !this.blocked.get(dir);
+                yield new ChessPosition(y + 1, x + 2);
+            }
+            case 3 -> {
+                logic = (y - 1 > 0) && (x + 2 <= 8) && !this.blocked.get(dir);
+                yield new ChessPosition(y - 1, x + 2);
+            }
+            case 4 -> {
+                logic = (y - 2 > 0) && (x + 1 <= 8) && !this.blocked.get(dir);
+                yield new ChessPosition(y - 2, x + 1);
+            }
+            case 5 -> {
+                logic = (y - 2 > 0) && (x - 1 > 0) && !this.blocked.get(dir);
+                yield new ChessPosition(y - 2, x - 1);
+            }
+            case 6 -> {
+                logic = (y - 1 > 0) && (x - 2 > 0) && !this.blocked.get(dir);
+                yield new ChessPosition(y - 1, x - 2);
+            }
+            case 7 -> {
+                logic = (y + 1 <= 8) && (x - 2 > 0) && !this.blocked.get(dir);
+                yield new ChessPosition(y + 1, x - 2);
+            }
+            default -> {
+                logic = false;
+                yield startPos;
+            }
+        };
+        if (logic) {
+            if ((board.getPiece(endPos) == null || board.getPiece(endPos).getTeamColor() != this.pieceColor)) {
+                moves.add(new ChessMove(startPos, endPos, null));
+            }
+        } else {
+            this.blocked.replace(dir, true);
+        }
+    }
+
+    /**
+     * I'm so tired of writing doc strings :(
+     * Promotes the pawn
+     *
+     * @param startPos where it is
+     * @param pawnEnd  where its going
+     * @param pawnDir  its direction
+     * @param moves    collection of valid moves
+     */
+    private void pawnPromotionManager(ChessPosition startPos, ChessPosition pawnEnd, int pawnDir, Collection<ChessMove> moves) {
+        int y = startPos.getRow();
+        if (y + pawnDir == 8 || y + pawnDir == 1) {
+            moves.add(new ChessMove(startPos, pawnEnd, PieceType.QUEEN));
+            moves.add(new ChessMove(startPos, pawnEnd, PieceType.KNIGHT));
+            moves.add(new ChessMove(startPos, pawnEnd, PieceType.BISHOP));
+            moves.add(new ChessMove(startPos, pawnEnd, PieceType.ROOK));
+        } else {
+            moves.add(new ChessMove(startPos, pawnEnd, null));
+        }
+    }
+
+    /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
      * danger
@@ -182,66 +262,8 @@ public class ChessPiece {
                 }
                 break;
             case KNIGHT:
-                ChessPosition endPos;
-                if (y + 2 <= 8) {
-                    if (x + 1 <= 8) {
-                        endPos = new ChessPosition(y + 2, x + 1);
-                        if (board.getPiece(endPos) == null || board.getPiece(endPos).getTeamColor() != this.pieceColor) {
-                            moves.add(new ChessMove(myPosition, endPos, null));
-                        }
-                    }
-                    if (x - 1 > 0) {
-                        endPos = new ChessPosition(y + 2, x - 1);
-                        if (board.getPiece(endPos) == null || board.getPiece(endPos).getTeamColor() != this.pieceColor) {
-                            moves.add(new ChessMove(myPosition, endPos, null));
-                        }
-                    }
-
-                }
-
-                if (y - 2 > 0) {
-                    if (x + 1 <= 8) {
-                        endPos = new ChessPosition(y - 2, x + 1);
-                        if (board.getPiece(endPos) == null || board.getPiece(endPos).getTeamColor() != this.pieceColor) {
-                            moves.add(new ChessMove(myPosition, endPos, null));
-                        }
-                    }
-                    if (x - 1 > 0) {
-                        endPos = new ChessPosition(y - 2, x - 1);
-                        if (board.getPiece(endPos) == null || board.getPiece(endPos).getTeamColor() != this.pieceColor) {
-                            moves.add(new ChessMove(myPosition, endPos, null));
-                        }
-                    }
-                }
-
-                if (x + 2 <= 8) {
-                    if (y + 1 <= 8) {
-                        endPos = new ChessPosition(y + 1, x + 2);
-                        if (board.getPiece(endPos) == null || board.getPiece(endPos).getTeamColor() != this.pieceColor) {
-                            moves.add(new ChessMove(myPosition, endPos, null));
-                        }
-                    }
-                    if (y - 1 > 0) {
-                        endPos = new ChessPosition(y - 1, x + 2);
-                        if (board.getPiece(endPos) == null || board.getPiece(endPos).getTeamColor() != this.pieceColor) {
-                            moves.add(new ChessMove(myPosition, endPos, null));
-                        }
-                    }
-                }
-
-                if (x - 2 > 0) {
-                    if (y + 1 <= 8) {
-                        endPos = new ChessPosition(y + 1, x - 2);
-                        if (board.getPiece(endPos) == null || board.getPiece(endPos).getTeamColor() != this.pieceColor) {
-                            moves.add(new ChessMove(myPosition, endPos, null));
-                        }
-                    }
-                    if (y - 1 > 0) {
-                        endPos = new ChessPosition(y - 1, x - 2);
-                        if (board.getPiece(endPos) == null || board.getPiece(endPos).getTeamColor() != this.pieceColor) {
-                            moves.add(new ChessMove(myPosition, endPos, null));
-                        }
-                    }
+                for (int i = 0; i < 8; i++) {
+                    knightMoveHelper(myPosition, i, board, moves);
                 }
                 break;
             case PAWN:
@@ -257,15 +279,7 @@ public class ChessPiece {
                 if ((y + pawnDir > 0) && (y + pawnDir <= 8)) {
                     pawnEnd = new ChessPosition(y + pawnDir, x);
                     if (board.getPiece(pawnEnd) == null) {
-                        if (y + pawnDir == 8 || y + pawnDir == 1) {
-                            moves.add(new ChessMove(myPosition, pawnEnd, PieceType.QUEEN));
-                            moves.add(new ChessMove(myPosition, pawnEnd, PieceType.KNIGHT));
-                            moves.add(new ChessMove(myPosition, pawnEnd, PieceType.BISHOP));
-                            moves.add(new ChessMove(myPosition, pawnEnd, PieceType.ROOK));
-                        } else {
-                            moves.add(new ChessMove(myPosition, pawnEnd, null));
-                        }
-
+                        pawnPromotionManager(myPosition, pawnEnd, pawnDir, moves);
                         pawnEnd = new ChessPosition(y + 2 * pawnDir, x);
                         if (((y + 2 * pawnDir > 0) && (y + 2 * pawnDir <= 8)) && (y == 2 || y == 7) && (board.getPiece(pawnEnd) == null)) { //worst logic I have ever written, but it works!
                             moves.add(new ChessMove(myPosition, pawnEnd, null));
@@ -276,28 +290,14 @@ public class ChessPiece {
                 if (x + 1 <= 8) {
                     pawnEnd = new ChessPosition(y + pawnDir, x + 1);
                     if (board.getPiece(pawnEnd) != null && board.getPiece(pawnEnd).getTeamColor() != this.pieceColor) {
-                        if (y + pawnDir == 8 || y + pawnDir == 1) {
-                            moves.add(new ChessMove(myPosition, pawnEnd, PieceType.QUEEN));
-                            moves.add(new ChessMove(myPosition, pawnEnd, PieceType.KNIGHT));
-                            moves.add(new ChessMove(myPosition, pawnEnd, PieceType.BISHOP));
-                            moves.add(new ChessMove(myPosition, pawnEnd, PieceType.ROOK));
-                        } else {
-                            moves.add(new ChessMove(myPosition, pawnEnd, null));
-                        }
+                        pawnPromotionManager(myPosition, pawnEnd, pawnDir, moves);
                     }
                 }
 
                 if (x - 1 > 0) {
                     pawnEnd = new ChessPosition(y + pawnDir, x - 1);
                     if (board.getPiece(pawnEnd) != null && board.getPiece(pawnEnd).getTeamColor() != this.pieceColor) {
-                        if (y + pawnDir == 8 || y + pawnDir == 1) {
-                            moves.add(new ChessMove(myPosition, pawnEnd, PieceType.QUEEN));
-                            moves.add(new ChessMove(myPosition, pawnEnd, PieceType.KNIGHT));
-                            moves.add(new ChessMove(myPosition, pawnEnd, PieceType.BISHOP));
-                            moves.add(new ChessMove(myPosition, pawnEnd, PieceType.ROOK));
-                        } else {
-                            moves.add(new ChessMove(myPosition, pawnEnd, null));
-                        }
+                        pawnPromotionManager(myPosition, pawnEnd, pawnDir, moves);
                     }
                 }
                 break;
