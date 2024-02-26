@@ -11,14 +11,15 @@ import java.util.Arrays;
 public class ChessBoard {
     private final ChessPiece[][] squares = new ChessPiece[8][8];
 
-    public ChessBoard() {    }
+    public ChessBoard() {
+    }
 
-    public ChessBoard(ChessBoard other){
-        for(int i = 1; i < 9; i++){
-            for(int j = 1; j < 9; j++){
-                ChessPosition pos = new ChessPosition(i,j);
+    public ChessBoard(ChessBoard other) {
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition pos = new ChessPosition(i, j);
                 ChessPiece piece = other.getPiece(pos);
-                if(piece != null){
+                if (piece != null) {
                     this.addPiece(pos, new ChessPiece(piece.getTeamColor(), piece.getPieceType()));
                 }
             }
@@ -40,72 +41,72 @@ public class ChessBoard {
 
     @Override
     public String toString() {
-        String out_string = "";
-        for(int r = 0; r<8; r++){
-            for(int c = 0; c < 8; c++){ //hehe, c++, hehehe
-                out_string += "|";
-                if(squares[r][c] == null){
-                    out_string += " ";
-                }else{
-                    switch(squares[r][c].getPieceType()){
+        String outString = "";
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) { //hehe, c++, hehehe
+                outString += "|";
+                if (squares[r][c] == null) {
+                    outString += " ";
+                } else {
+                    switch (squares[r][c].getPieceType()) {
                         case KING:
-                            if(squares[r][c].getTeamColor() == ChessGame.TeamColor.WHITE){
-                                out_string += "K";
-                            }else{
-                                out_string += "k";
+                            if (squares[r][c].getTeamColor() == ChessGame.TeamColor.WHITE) {
+                                outString += "K";
+                            } else {
+                                outString += "k";
                             }
                             break;
 
                         case QUEEN:
-                            if(squares[r][c].getTeamColor() == ChessGame.TeamColor.WHITE){
-                                out_string += "Q";
-                            }else{
-                                out_string += "q";
+                            if (squares[r][c].getTeamColor() == ChessGame.TeamColor.WHITE) {
+                                outString += "Q";
+                            } else {
+                                outString += "q";
                             }
                             break;
 
                         case BISHOP:
-                            if(squares[r][c].getTeamColor() == ChessGame.TeamColor.WHITE){
-                                out_string += "B";
-                            }else{
-                                out_string += "b";
+                            if (squares[r][c].getTeamColor() == ChessGame.TeamColor.WHITE) {
+                                outString += "B";
+                            } else {
+                                outString += "b";
                             }
                             break;
 
                         case KNIGHT:
-                            if(squares[r][c].getTeamColor() == ChessGame.TeamColor.WHITE){
-                                out_string += "N";
-                            }else{
-                                out_string += "n";
+                            if (squares[r][c].getTeamColor() == ChessGame.TeamColor.WHITE) {
+                                outString += "N";
+                            } else {
+                                outString += "n";
                             }
                             break;
 
                         case ROOK:
-                            if(squares[r][c].getTeamColor() == ChessGame.TeamColor.WHITE){
-                                out_string += "R";
-                            }else{
-                                out_string += "r";
+                            if (squares[r][c].getTeamColor() == ChessGame.TeamColor.WHITE) {
+                                outString += "R";
+                            } else {
+                                outString += "r";
                             }
                             break;
 
                         case PAWN:
-                            if(squares[r][c].getTeamColor() == ChessGame.TeamColor.WHITE){
-                                out_string += "P";
-                            }else{
-                                out_string += "p";
+                            if (squares[r][c].getTeamColor() == ChessGame.TeamColor.WHITE) {
+                                outString += "P";
+                            } else {
+                                outString += "p";
                             }
                             break;
 
                         default:
-                            out_string += "#";
+                            outString += "#";
                             break;
                     }
                 }
-                out_string += "|";
+                outString += "|";
             }
-            out_string += "\n";
+            outString += "\n";
         }
-        return  out_string;
+        return outString;
     }
 
     /**
@@ -115,7 +116,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow()-1][position.getColumn()-1] = piece;
+        squares[position.getRow() - 1][position.getColumn() - 1] = piece;
     }
 
     /**
@@ -126,7 +127,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return squares[position.getRow()-1][position.getColumn()-1];
+        return squares[position.getRow() - 1][position.getColumn() - 1];
     }
 
     /**
@@ -135,13 +136,13 @@ public class ChessBoard {
      *
      * @param move The move to make
      */
-    public void movePiece(ChessMove move){
+    public void movePiece(ChessMove move) {
         var piece = getPiece(move.getStartPosition());
-        if(piece != null){
+        if (piece != null) {
             this.addPiece(move.getStartPosition(), null);
-            if(move.getPromotionPiece() == null){
+            if (move.getPromotionPiece() == null) {
                 this.addPiece(move.getEndPosition(), piece);
-            }else{
+            } else {
                 this.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
             }
         }
@@ -153,7 +154,7 @@ public class ChessBoard {
      */
     public void resetBoard() {
         //White
-        for(int i = 1; i<9; i++){
+        for (int i = 1; i < 9; i++) {
             this.addPiece(new ChessPosition(2, i), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
         }
 
@@ -168,7 +169,7 @@ public class ChessBoard {
 
 
         //Black
-        for(int i = 1; i<9; i++){
+        for (int i = 1; i < 9; i++) {
             this.addPiece(new ChessPosition(7, i), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
         }
 

@@ -14,14 +14,14 @@ public class ChessGame {
     private TeamColor turn;
     private ChessBoard board;
 
-    private final HashMap<TeamColor, ChessPosition> king_pos;
+    private final HashMap<TeamColor, ChessPosition> kingPos;
 
     public ChessGame() {
         turn = TeamColor.WHITE; //first turn is always white.
         board = new ChessBoard();
-        king_pos = new HashMap<>();
-        king_pos.put(TeamColor.WHITE, null);
-        king_pos.put(TeamColor.BLACK, null);
+        kingPos = new HashMap<>();
+        kingPos.put(TeamColor.WHITE, null);
+        kingPos.put(TeamColor.BLACK, null);
     }
 
     /**
@@ -48,28 +48,28 @@ public class ChessGame {
         BLACK
     }
 
-    private void findKings(){
-        for(int i = 1; i < 9; i++){
-            for(int j = 1; j < 9; j ++){
+    private void findKings() {
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
                 var piece = board.getPiece(new ChessPosition(i, j));
-                if(piece != null && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING) {
                     if (piece.getTeamColor() == TeamColor.WHITE) { //IntelliJ freaks out if I just put piece.getTeamColor() into the HashMap
-                        this.king_pos.put(TeamColor.WHITE, new ChessPosition(i, j));
-                    }else{
-                        this.king_pos.put(TeamColor.BLACK, new ChessPosition(i, j));
+                        this.kingPos.put(TeamColor.WHITE, new ChessPosition(i, j));
+                    } else {
+                        this.kingPos.put(TeamColor.BLACK, new ChessPosition(i, j));
                     }
                 }
             }
         }
     }
 
-    private Collection<ChessPosition> scanBoard(TeamColor teamColor){
+    private Collection<ChessPosition> scanBoard(TeamColor teamColor) {
         HashSet<ChessPosition> positions = new HashSet<>();
-        for(int i = 1; i < 9; i++){
-            for(int j = 1; j < 9; j ++){
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
                 var piece = board.getPiece(new ChessPosition(i, j));
-                if(piece != null){
-                    if(piece.getTeamColor() == teamColor){
+                if (piece != null) {
+                    if (piece.getTeamColor() == teamColor) {
                         positions.add(new ChessPosition(i, j));
                     }
                 }
@@ -87,20 +87,20 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
-        if(piece != null) {
+        if (piece != null) {
             var color = piece.getTeamColor();
-            var valid_moves = new HashSet<ChessMove>();
-            var old_board = new ChessBoard(this.board);
-            var piece_moves = piece.pieceMoves(old_board, startPosition);
-            for (var move : piece_moves) {
+            var validPieceMoves = new HashSet<ChessMove>();
+            var oldBoard = new ChessBoard(this.board);
+            var pieceMoves = piece.pieceMoves(oldBoard, startPosition);
+            for (var move : pieceMoves) {
 //                    System.out.println(board);
                 this.board.movePiece(move);
                 if (!isInCheck(color)) {
-                    valid_moves.add(move);
+                    validPieceMoves.add(move);
                 }
-                this.setBoard(old_board);
+                this.setBoard(oldBoard);
             }
-            return valid_moves;
+            return validPieceMoves;
 
         }
         return null;
@@ -115,19 +115,19 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         var start = move.getStartPosition();
-        if(board.getPiece(start).getTeamColor() != getTeamTurn()){
+        if (board.getPiece(start).getTeamColor() != getTeamTurn()) {
             throw new InvalidMoveException("It is not the pieces turn!");
         }
-        var valid_moves = validMoves(start);
-        if(valid_moves != null && valid_moves.contains(move)){
+        var validMoves = validMoves(start);
+        if (validMoves != null && validMoves.contains(move)) {
 
             board.movePiece(move);
-            if(getTeamTurn() == TeamColor.WHITE){
+            if (getTeamTurn() == TeamColor.WHITE) {
                 setTeamTurn(TeamColor.BLACK);
-            }else{
+            } else {
                 setTeamTurn(TeamColor.WHITE);
             }
-        }else{
+        } else {
             throw new InvalidMoveException("Move is invalid!");
         }
     }
@@ -141,20 +141,20 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         findKings();
 
-        Collection<ChessPosition> enemy_pos;
+        Collection<ChessPosition> enemyPos;
 
-        if(teamColor == TeamColor.WHITE){
-            enemy_pos = this.scanBoard(TeamColor.BLACK);
-        }else{
-            enemy_pos = this.scanBoard(TeamColor.WHITE);
+        if (teamColor == TeamColor.WHITE) {
+            enemyPos = this.scanBoard(TeamColor.BLACK);
+        } else {
+            enemyPos = this.scanBoard(TeamColor.WHITE);
         }
-        ChessPosition king_pos = this.king_pos.get(teamColor);
+        ChessPosition currentKingPos = this.kingPos.get(teamColor);
 
-        if(!enemy_pos.isEmpty() && king_pos != null){
-            for(var pos : enemy_pos){
-                var possible_moves = board.getPiece(pos).pieceMoves(board, pos);
-                if(possible_moves.contains(new ChessMove(pos, king_pos, null))
-                || possible_moves.contains(new ChessMove(pos, king_pos, ChessPiece.PieceType.QUEEN))){ //pawns can always promote to a queen.
+        if (!enemyPos.isEmpty() && currentKingPos != null) {
+            for (var pos : enemyPos) {
+                var possibleMoves = board.getPiece(pos).pieceMoves(board, pos);
+                if (possibleMoves.contains(new ChessMove(pos, currentKingPos, null))
+                        || possibleMoves.contains(new ChessMove(pos, currentKingPos, ChessPiece.PieceType.QUEEN))) { //pawns can always promote to a queen.
                     return true;
                 }
             }
@@ -180,14 +180,14 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-            var piece_pos = scanBoard(teamColor);
-            for(ChessPosition pos : piece_pos){
-                var valid_moves = validMoves(pos);
-                if(valid_moves!= null && !validMoves(pos).isEmpty()){
-                    return false;
-                }
+        var piecePos = scanBoard(teamColor);
+        for (ChessPosition pos : piecePos) {
+            var validPieceMoves = validMoves(pos);
+            if (validPieceMoves != null && !validMoves(pos).isEmpty()) {
+                return false;
             }
-            return true;
+        }
+        return true;
     }
 
     /**

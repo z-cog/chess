@@ -59,10 +59,10 @@ public class Server {
     }
 
     private String authHandler(Request request) throws UnauthorizedUserException {
-        if (request.headers() == null) {
+        if (request.headers("authorization") == null) {
             throw new UnauthorizedUserException("Error: unauthorized");
         }
-        return new Gson().fromJson(request.headers("authorization"), String.class);
+        return request.headers("authorization");
     }
 
     public void stop() {

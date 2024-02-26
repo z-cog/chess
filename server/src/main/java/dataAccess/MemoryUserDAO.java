@@ -10,9 +10,9 @@ public class MemoryUserDAO implements UserDAO {
 
     public UserData createUser(String username, String password, String email) throws DataAccessException {
         dataBaseTest();
-        UserData new_user = new UserData(username, password, email);
-        user.add(new_user);
-        return new_user;
+        UserData newUser = new UserData(username, password, email);
+        user.add(newUser);
+        return newUser;
     }
 
     public UserData getUser(String username) throws DataAccessException {
