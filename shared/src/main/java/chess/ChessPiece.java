@@ -200,7 +200,7 @@ public class ChessPiece {
      * Promotes the pawn
      *
      * @param startPos where it is
-     * @param pawnEnd  where its going
+     * @param pawnEnd  where it's going
      * @param pawnDir  its direction
      * @param moves    collection of valid moves
      */
