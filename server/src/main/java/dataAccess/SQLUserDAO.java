@@ -2,9 +2,6 @@ package dataAccess;
 
 import model.UserData;
 
-import java.util.HashSet;
-import java.util.Objects;
-
 public class SQLUserDAO implements UserDAO {
     SQLUserDAO() {
         //connect to user
