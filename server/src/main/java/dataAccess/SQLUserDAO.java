@@ -1,11 +1,9 @@
 package dataAccess;
 
-import model.AuthData;
 import model.UserData;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.SQLException;
-import java.util.Objects;
 
 public class SQLUserDAO implements UserDAO {
     BCryptPasswordEncoder encoder;
@@ -16,10 +14,20 @@ public class SQLUserDAO implements UserDAO {
     }
 
     public UserData createUser(String username, String password, String email) throws DataAccessException {
-        var hashedPassword = encoder.encode(password); //but hashed!
-        UserData newUser = new UserData(username, hashedPassword, email);
+        var hashedPassword = encoder.encode(password);
         //INSERT INTO user (username, password, email) VALUES (newUser.username, newUser.hashedPassword, newUser.email)
-        return newUser;
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "INSERT INTO user (username, password, email) VALUES (?,?,?)";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                ps.setString(2, hashedPassword);
+                ps.setString(3, email);
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: database inaccessible");
+        }
+        return new UserData(username, password, email);
     }
 
     public UserData getUser(String username) throws DataAccessException {
