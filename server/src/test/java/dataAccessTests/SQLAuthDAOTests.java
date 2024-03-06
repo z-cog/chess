@@ -12,13 +12,14 @@ public class SQLAuthDAOTests {
     @Test
     public void createAuthTest() {
         try {
-            var authDao = new SQLAuthDAO();
+            var auth = new SQLAuthDAO();
             var user = new UserData("bob", "bob1234", "bob@bob.bob");
-            assertDoesNotThrow(() -> authDao.createAuth(user));
+            assertDoesNotThrow(() -> auth.createAuth(user));
+
             //duplicate authTokens for users are allowed
-            assertDoesNotThrow(() -> authDao.createAuth(user));
-            //You can't really fail to make a new auth really, so I hope this is good enough for now.
-            authDao.clear();
+            assertDoesNotThrow(() -> auth.createAuth(user));
+            
+            auth.clear();
 
         } catch (Exception e) {
             fail(e.getMessage());
@@ -29,15 +30,15 @@ public class SQLAuthDAOTests {
     @Test
     public void getAuthTest() {
         try {
-            var authDao = new SQLAuthDAO();
+            var auth = new SQLAuthDAO();
             //authToken not in database.
-            assertNull(authDao.getAuth("fejkaldsf"));
+            assertNull(auth.getAuth("fejkaldsf"));
 
             //authToken is in database.
-            AuthData authData = authDao.createAuth(new UserData("bob", "bob1234", "bob@bob.bob"));
-            assertNotNull(authDao.getAuth(authData.authToken()));
+            AuthData authData = auth.createAuth(new UserData("bob", "bob1234", "bob@bob.bob"));
+            assertNotNull(auth.getAuth(authData.authToken()));
 
-            authDao.clear();
+            auth.clear();
 
         } catch (Exception e) {
             fail(e.getMessage());
@@ -48,13 +49,13 @@ public class SQLAuthDAOTests {
     @Test
     public void deleteAuthTest() {
         try {
-            var authDao = new SQLAuthDAO();
-            AuthData authData = authDao.createAuth(new UserData("bob", "bob1234", "bob@bob.bob"));
-            assertDoesNotThrow(() -> authDao.removeAuth(authData));
+            var auth = new SQLAuthDAO();
+            AuthData authData = auth.createAuth(new UserData("bob", "bob1234", "bob@bob.bob"));
+            assertDoesNotThrow(() -> auth.removeAuth(authData));
 
             //removing a non-existent auth doesn't throw.
-            assertDoesNotThrow(() -> authDao.removeAuth(authData));
-            
+            assertDoesNotThrow(() -> auth.removeAuth(authData));
+
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -63,8 +64,8 @@ public class SQLAuthDAOTests {
     @Test
     public void clearAuthTest() {
         try {
-            var authDao = new SQLAuthDAO();
-            assertDoesNotThrow(authDao::clear);
+            var auth = new SQLAuthDAO();
+            assertDoesNotThrow(auth::clear);
         } catch (Exception e) {
             fail(e.getMessage());
         }

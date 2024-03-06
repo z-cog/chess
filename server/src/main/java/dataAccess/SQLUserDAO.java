@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 public class SQLUserDAO implements UserDAO {
-    SQLUserDAO() throws DataAccessException {
+    public SQLUserDAO() throws DataAccessException {
         configureDatabase();
     }
 
