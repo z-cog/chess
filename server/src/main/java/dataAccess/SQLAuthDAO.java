@@ -3,40 +3,94 @@ package dataAccess;
 import model.AuthData;
 import model.UserData;
 
+import java.sql.SQLException;
 import java.util.UUID;
 
 public class SQLAuthDAO implements AuthDAO {
 
-    SQLAuthDAO() {
-        //connect to auth table
+    public SQLAuthDAO() throws DataAccessException {
+        configureDatabase();
     }
 
     public AuthData createAuth(UserData user) throws DataAccessException {
-        dataBaseTest();
-        AuthData newAuth = new AuthData(UUID.randomUUID().toString(), user.username());
-        //INSERT INTO auth (authToken, username) VALUES (newAuth.authToken, newAuth.username
-        return newAuth;
+        String authToken = UUID.randomUUID().toString();
+        String username = user.username();
+
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "INSERT INTO auth (authToken, username) VALUES (?,?)";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authToken);
+                ps.setString(2, username);
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: database inaccessible");
+        }
+        return new AuthData(authToken, username);
     }
 
     public AuthData getAuth(String authToken) throws DataAccessException {
-        dataBaseTest();
-        //SELECT authToken from auth
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username FROM auth WHERE authToken=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authToken);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        var username = rs.getString("username");
+                        return new AuthData(authToken, username);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: database inaccessible");
+        }
         return null;
     }
 
     public void removeAuth(AuthData currentAuth) throws DataAccessException {
-        dataBaseTest();
-        //DELETE FROM auth WHERE authToken = currentAuth
+        var authToken = currentAuth.authToken();
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "DELETE FROM auth WHERE authToken=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authToken);
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: database inaccessible");
+        }
     }
 
     public void clear() throws DataAccessException {
-        dataBaseTest();
-        //TRUNCATE TABLE auth
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "TRUNCATE TABLE auth";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: database inaccessible");
+        }
     }
 
-    private void dataBaseTest() throws DataAccessException {
-        //insert code to check if connection worked. Maybe not needed??
-        throw new DataAccessException("Error: auth database inaccessible");
+    private void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        try (var conn = DatabaseManager.getConnection()) {
+            String createStatement = """
+                    CREATE TABLE IF NOT EXISTS  auth (
+                      `id` INT NOT NULL AUTO_INCREMENT,
+                      `authToken` varchar(256) NOT NULL,
+                      `username` varchar(256) NOT NULL,
+                      PRIMARY KEY (`id`),
+                      INDEX(authToken),
+                      INDEX(username)
+                    );
+                    """;
+            try (var preparedStatement = conn.prepareStatement(createStatement)) {
+                preparedStatement.executeUpdate();
+            }
+
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error: unable to configure database");
+        }
     }
 
 }
