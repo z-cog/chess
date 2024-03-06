@@ -76,12 +76,11 @@ public class SQLUserDAO implements UserDAO {
         try (var conn = DatabaseManager.getConnection()) {
             String createStatement = """
                     CREATE TABLE IF NOT EXISTS  user (
-                      `id` INT NOT NULL AUTO_INCREMENT,
                       `username` varchar(256) NOT NULL,
                       `password` varchar(256) NOT NULL,
                       `email` varchar(256) NOT NULL,
-                      PRIMARY KEY (`id`),
-                      INDEX(username)
+                      PRIMARY KEY (`username`),
+                      INDEX(email)
                     );
                     """;
             try (var preparedStatement = conn.prepareStatement(createStatement)) {
