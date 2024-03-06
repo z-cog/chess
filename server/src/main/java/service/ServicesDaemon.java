@@ -10,7 +10,6 @@ import model.GameData;
 import model.UserData;
 
 import java.util.Collection;
-import java.util.Objects;
 
 public class ServicesDaemon {
     private final AuthDAO auth;
@@ -49,7 +48,7 @@ public class ServicesDaemon {
             throw new BadRequestException("Error: bad request");
         }
         UserData currentUser = user.getUser(username);
-        if ((currentUser == null) || (!Objects.equals(currentUser.password(), password))) {
+        if ((currentUser == null) || (!user.checkPassword(username, password))) {
             throw new UnauthorizedUserException("Error: unauthorized");
         } else {
             return auth.createAuth(currentUser).authToken();

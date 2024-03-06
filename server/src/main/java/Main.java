@@ -1,4 +1,5 @@
 import dataAccess.SQLAuthDAO;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import server.Server;
 
 import java.util.Scanner;

@@ -2,6 +2,8 @@ package dataAccess;
 
 import model.UserData;
 
+import java.util.Objects;
+
 public class SQLUserDAO implements UserDAO {
     SQLUserDAO() {
         //connect to user
@@ -19,6 +21,10 @@ public class SQLUserDAO implements UserDAO {
         dataBaseTest();
         //SELECT FROM user WHERE username = username
         return null;
+    }
+
+    public Boolean checkPassword(String username, String password) throws DataAccessException {
+        return false;
     }
 
     public void clear() throws DataAccessException {
