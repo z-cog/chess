@@ -10,10 +10,21 @@ import service.UnauthorizedUserException;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LoginTests {
-    AuthDAO auth = new MemoryAuthDAO();
-    GameDAO games = new MemoryGameDAO();
-    UserDAO user = new MemoryUserDAO();
-    ServicesDaemon service = new ServicesDaemon(auth, games, user);
+    AuthDAO auth;
+    GameDAO games;
+    UserDAO user;
+    ServicesDaemon service;
+
+    public LoginTests() {
+        try {
+            auth = new SQLAuthDAO();
+            games = new SQLGameDAO();
+            user = new SQLUserDAO();
+            service = new ServicesDaemon(auth, games, user);
+        } catch (Exception e) {
+            System.out.println("Error, compilation failed: " + e.getMessage());
+        }
+    }
 
     @BeforeEach
     public void init() {
@@ -48,5 +59,5 @@ public class LoginTests {
     public void loginBadRequest() {
         assertThrows(BadRequestException.class, () -> service.login("", ""));
     }
-    
+
 }

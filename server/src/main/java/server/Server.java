@@ -11,10 +11,21 @@ import spark.*;
 import java.util.Map;
 
 public class Server {
-    AuthDAO auth = new MemoryAuthDAO();
-    GameDAO games = new MemoryGameDAO();
-    UserDAO user = new MemoryUserDAO();
-    ServicesDaemon service = new ServicesDaemon(auth, games, user);
+    AuthDAO auth;
+    GameDAO games;
+    UserDAO user;
+    ServicesDaemon service;
+
+    public Server() {
+        try {
+            auth = new SQLAuthDAO();
+            games = new SQLGameDAO();
+            user = new SQLUserDAO();
+            service = new ServicesDaemon(auth, games, user);
+        } catch (Exception e) {
+            System.out.println("Error: Server failed to comple" + e.getMessage());
+        }
+    }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);

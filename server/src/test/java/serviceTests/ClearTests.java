@@ -7,10 +7,21 @@ import service.ServicesDaemon;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ClearTests {
-    AuthDAO auth = new MemoryAuthDAO();
-    GameDAO games = new MemoryGameDAO();
-    UserDAO user = new MemoryUserDAO();
-    ServicesDaemon service = new ServicesDaemon(auth, games, user);
+    AuthDAO auth;
+    GameDAO games;
+    UserDAO user;
+    ServicesDaemon service;
+
+    public ClearTests() {
+        try {
+            auth = new SQLAuthDAO();
+            games = new SQLGameDAO();
+            user = new SQLUserDAO();
+            service = new ServicesDaemon(auth, games, user);
+        } catch (Exception e) {
+            System.out.println("Error, compilation failed: " + e.getMessage());
+        }
+    }
 
     @Test
     public void clearTest() {
