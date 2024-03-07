@@ -1,6 +1,8 @@
 package dataAccessTests;
 
+import chess.ChessGame;
 import dataAccess.SQLGameDAO;
+import model.GameData;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,6 +40,28 @@ public class SQLGameDAOTests {
             assertEquals(4, games.getGame(-1).size());
 
             games.clear();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void updateGameTest() {
+        try {
+            var games = new SQLGameDAO();
+
+            int specificID = games.createGame("bobzgame1");
+
+            var gameCollection = games.getGame(specificID);
+            GameData oldGame = (GameData) gameCollection.toArray()[0];
+            games.updateGame(new GameData(specificID, "bob", "eric", oldGame.gameName(), oldGame.game()));
+
+            assertEquals("bob", ((GameData) games.getGame(specificID).toArray()[0]).whiteUsername());
+            assertEquals("eric", ((GameData) games.getGame(specificID).toArray()[0]).blackUsername());
+
+            //update nonexistent game does not throw.
+            assertDoesNotThrow(() -> games.updateGame(new GameData(45654, null, null, "fake game", new ChessGame())));
+
         } catch (Exception e) {
             fail(e.getMessage());
         }

@@ -20,8 +20,6 @@ public class SQLGameDAO implements GameDAO {
     }
 
     public int createGame(String gameName) throws DataAccessException {
-        //serialize new ChessGame();
-        //INSERT INTO games (gameName, game) VALUES (gameName, see above)
         int gameID = 0;
         var serializedGame = new Gson().toJson(new ChessGame());
         try (var conn = DatabaseManager.getConnection()) {
@@ -69,6 +67,19 @@ public class SQLGameDAO implements GameDAO {
 
     public void updateGame(GameData game) throws DataAccessException {
         //UPDATE games SET ALL = ALL WHERE id = game.id
+        var serializedGame = new Gson().toJson(game.game());
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "UPDATE games SET whiteUsername = ?, blackUsername = ?, game = ? WHERE gameID = ?";
+            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                ps.setString(1, game.whiteUsername());
+                ps.setString(2, game.blackUsername());
+                ps.setString(3, serializedGame);
+                ps.setInt(4, game.gameID());
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: database inaccessible");
+        }
     }
 
     public void clear() throws DataAccessException {
