@@ -19,7 +19,12 @@ public class ChessUI {
         out.print(ERASE_SCREEN);
         var board = new ChessBoard();
         board.resetBoard();
-        board.addPiece(new ChessPosition(5, 5), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING));
+        for (int i = 1; i < 9; i++) {
+            board.addPiece(new ChessPosition(6, i), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+            board.addPiece(new ChessPosition(5, i), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+            board.addPiece(new ChessPosition(4, i), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+            board.addPiece(new ChessPosition(3, i), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+        }
         printBoard(board, ChessGame.TeamColor.BLACK);
         printBoard(board, ChessGame.TeamColor.WHITE);
 
@@ -122,27 +127,13 @@ public class ChessUI {
         }
 
         switch (type) {
-            case KING -> {
-                output = "K";
-            }
-            case QUEEN -> {
-                output = "Q";
-            }
-            case BISHOP -> {
-                output = "B";
-            }
-            case KNIGHT -> {
-                output = "N";
-            }
-            case ROOK -> {
-                output = "R";
-            }
-            case PAWN -> {
-                output = "P";
-            }
-            default -> {
-                output = EMPTY;
-            }
+            case KING -> output = "K";
+            case QUEEN -> output = "Q";
+            case BISHOP -> output = "B";
+            case KNIGHT -> output = "N";
+            case ROOK -> output = "R";
+            case PAWN -> output = "P";
+            default -> output = EMPTY;
         }
 
         out.print(output);
