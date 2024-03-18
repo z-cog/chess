@@ -58,35 +58,56 @@ public class ChessClient {
     }
 
     private String register(String... params) throws Exception {
-        if (params.length == 3) {
-            System.out.print(Arrays.toString(params));
-            this.state = State.POSTLOGIN;
-            return "dfa";
+        try {
+            if (params.length == 3) {
+                System.out.print(Arrays.toString(params));
+                this.state = State.POSTLOGIN;
+                server.register(params[0], params[1], params[2]);
+                return "registered as " + params[0] + " at idk like 5:00pm?";
+            }
+            throw new Exception("Expected: register <username> <password> <email>");
+        } catch (Exception e) {
+            this.state = State.PRELOGIN;
+            throw e;
         }
-        throw new Exception("Expected: register <username> <password> <email>");
     }
 
     private String login(String... params) throws Exception {
-        if (params.length == 2) {
-            System.out.print(Arrays.toString(params));
-            this.state = State.POSTLOGIN;
-            return "dfa";
+        try {
+            if (params.length == 2) {
+                System.out.print(Arrays.toString(params));
+                this.state = State.POSTLOGIN;
+                return "dfa";
+            }
+            throw new Exception("Expected: login <username> <password>");
+        } catch (Exception e) {
+            this.state = State.PRELOGIN;
+            throw e;
         }
-        throw new Exception("Expected: login <username> <password>");
     }
 
     private String logout() throws Exception {
-        this.state = State.PRELOGIN;
-        return "success!";
+        try {
+            this.state = State.PRELOGIN;
+            return "success!";
+        } catch (Exception e) {
+            this.state = State.POSTLOGIN;
+            throw e;
+        }
     }
 
     private String createGame(String... params) throws Exception {
-        if (params.length == 1) {
-            System.out.print(Arrays.toString(params));
-            this.state = State.GAMEPLAY;
-            return "dfa";
+        try {
+            if (params.length == 1) {
+                System.out.print(Arrays.toString(params));
+                this.state = State.GAMEPLAY;
+                return "dfa";
+            }
+            throw new Exception("Expected: create <gameName>");
+        } catch (Exception e) {
+            this.state = State.POSTLOGIN;
+            throw e;
         }
-        throw new Exception("Expected: create <gameName>");
     }
 
     private String listGames() throws Exception {
@@ -101,22 +122,31 @@ public class ChessClient {
     }
 
     private String joinGame(String... params) throws Exception {
-        if (params.length == 1) {
-            System.out.print(Arrays.toString(params));
-            this.state = State.GAMEPLAY;
-            return "dfa";
+        try {
+            if (params.length == 1) {
+                System.out.print(Arrays.toString(params));
+                this.state = State.GAMEPLAY;
+                return "dfa";
+            }
+            throw new Exception("Expected: login <username> <password>");
+        } catch (Exception e) {
+            this.state = State.POSTLOGIN;
+            throw e;
         }
-        throw new Exception("Expected: login <username> <password>");
     }
 
     private String observeGame(String... params) throws Exception {
-        if (params.length == 1) {
-            System.out.print(Arrays.toString(params));
-            this.state = State.GAMEPLAY;
-
-            return "Observing game ";
+        try {
+            if (params.length == 1) {
+                System.out.print(Arrays.toString(params));
+                this.state = State.GAMEPLAY;
+                return "Observing game ";
+            }
+            throw new Exception("Expected: observe <ID>");
+        } catch (Exception e) {
+            this.state = State.POSTLOGIN;
+            throw e;
         }
-        throw new Exception("Expected: observe <ID>");
     }
 
     private String help() {
