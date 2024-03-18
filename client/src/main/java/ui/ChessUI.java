@@ -13,23 +13,23 @@ public class ChessUI {
     private static final int SQUARE_SIZE_IN_CHARS = 3;
     private static final String EMPTY = " ";
 
-
-    public static void main(String[] args) {
-        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        out.print(ERASE_SCREEN);
-        var board = new ChessBoard();
-        board.resetBoard();
-//        for (int i = 1; i < 9; i++) {
-//            board.addPiece(new ChessPosition(6, i), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-//            board.addPiece(new ChessPosition(5, i), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-//            board.addPiece(new ChessPosition(4, i), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-//            board.addPiece(new ChessPosition(3, i), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-//        }
-        printBoard(board, ChessGame.TeamColor.BLACK);
-        printBoard(board, ChessGame.TeamColor.WHITE);
-
-
-    }
+//
+//    public static void main(String[] args) {
+//        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+//        out.print(ERASE_SCREEN);
+//        var board = new ChessBoard();
+//        board.resetBoard();
+////        for (int i = 1; i < 9; i++) {
+////            board.addPiece(new ChessPosition(6, i), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+////            board.addPiece(new ChessPosition(5, i), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+////            board.addPiece(new ChessPosition(4, i), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+////            board.addPiece(new ChessPosition(3, i), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+////        }
+//        printBoard(board, ChessGame.TeamColor.BLACK);
+//        printBoard(board, ChessGame.TeamColor.WHITE);
+//
+//
+//    }
 
     public static void printBoard(ChessBoard board, ChessGame.TeamColor color) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
