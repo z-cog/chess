@@ -5,6 +5,7 @@ import chess.ChessGame;
 import ui.ChessUI;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Objects;
 
 import static ui.EscapeSequences.ERASE_SCREEN;
@@ -13,9 +14,12 @@ public class ChessClient {
     private final ServerFacade server;
     private State state;
 
+    private HashMap<Integer, String> games;
+
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
         this.state = State.PRELOGIN;
+        this.games = new HashMap<>();
     }
 
     public String eval(String input) throws Exception {
@@ -31,16 +35,16 @@ public class ChessClient {
                 return switch (prompt) {
                     case "login" -> login(params);
                     case "register" -> register(params);
-                    default -> "Unknown command! Type 'help' for list of commands.";
+                    default -> "Unknown command! Type 'help' for list of commands.\n";
                 };
             } else if (state == State.POSTLOGIN) {
                 return switch (prompt) {
                     case "logout" -> logout();
-                    case "create" -> createGame();
+                    case "create" -> createGame(params);
                     case "list" -> listGames();
-                    case "join" -> joinGame();
-                    case "observe" -> observeGame();
-                    default -> "Unknown command! Type 'help' for list of commands.";
+                    case "join" -> joinGame(params);
+                    case "observe" -> observeGame(params);
+                    default -> "Unknown command! Type 'help' for list of commands.\n";
                 };
             } else {
                 System.out.print(ERASE_SCREEN);
@@ -71,37 +75,35 @@ public class ChessClient {
         throw new Exception("Expected: login <username> <password>");
     }
 
-    private String logout(String... params) throws Exception {
-        if (params.length == 2) {
-            System.out.print(Arrays.toString(params));
-            this.state = State.POSTLOGIN;
-            return "dfa";
-        }
-        throw new Exception("Expected: login <username> <password>");
+    private String logout() throws Exception {
+        this.state = State.PRELOGIN;
+        return "success!";
     }
 
     private String createGame(String... params) throws Exception {
-        if (params.length == 2) {
+        if (params.length == 1) {
             System.out.print(Arrays.toString(params));
-            this.state = State.POSTLOGIN;
+            this.state = State.GAMEPLAY;
             return "dfa";
         }
-        throw new Exception("Expected: login <username> <password>");
+        throw new Exception("Expected: create <gameName>");
     }
 
-    private String listGames(String... params) throws Exception {
-        if (params.length == 2) {
-            System.out.print(Arrays.toString(params));
-            this.state = State.POSTLOGIN;
-            return "dfa";
+    private String listGames() throws Exception {
+        this.games.clear();
+        var gameList = new String[]{"fea", "feaadsf", "dfea"};
+        StringBuilder output = new StringBuilder();
+        for (int i = 0; i < gameList.length; i++) {
+            this.games.put(i, gameList[i]);
+            output.append(gameList[i]).append("\n");
         }
-        throw new Exception("Expected: login <username> <password>");
+        return output.toString();
     }
 
     private String joinGame(String... params) throws Exception {
-        if (params.length == 2) {
+        if (params.length == 1) {
             System.out.print(Arrays.toString(params));
-            this.state = State.POSTLOGIN;
+            this.state = State.GAMEPLAY;
             return "dfa";
         }
         throw new Exception("Expected: login <username> <password>");
@@ -110,8 +112,9 @@ public class ChessClient {
     private String observeGame(String... params) throws Exception {
         if (params.length == 1) {
             System.out.print(Arrays.toString(params));
-            this.state = State.POSTLOGIN;
-            return "dfa";
+            this.state = State.GAMEPLAY;
+
+            return "Observing game ";
         }
         throw new Exception("Expected: observe <ID>");
     }
@@ -124,7 +127,7 @@ public class ChessClient {
                     - help
                     - quit
                     """;
-        } else {
+        } else if (state == State.POSTLOGIN) {
             return """
                     - logout
                     - create
@@ -134,6 +137,8 @@ public class ChessClient {
                     - help
                     - quit
                     """;
+        } else {
+            return "- begin";
         }
     }
 }

@@ -6,5 +6,6 @@ public class ServerFacade {
 
     public ServerFacade(String serverUrl) {
         this.authToken = null;
+        this.url = serverUrl;
     }
 }
