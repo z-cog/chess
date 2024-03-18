@@ -1,80 +1,38 @@
 package clientSoftware;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import ui.ChessUI;
-
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
 public class ChessREPL {
-    State state;
-    ServerFacade server;
+    private final ChessClient client;
 
     public ChessREPL(String serverUrl) {
-        this.server = new ServerFacade(serverUrl);
+        this.client = new ChessClient(serverUrl);
     }
 
     public void run() {
-        this.state = State.PRELOGIN;
         System.out.print(SET_TEXT_COLOR_BLUE);
-        System.out.println("Hello welcom 2 the chess gayme");
+        System.out.println("Hello welcome to the chess game");
 
         Scanner scanner = new Scanner(System.in);
 
-        var prompt = "";
+        var result = "";
 
-        while (!prompt.equals("quit")) {
+        while (!result.equals("quit")) {
             System.out.print(SET_TEXT_COLOR_GREEN);
             System.out.print(">>> ");
 
-            prompt = scanner.nextLine();
-            if (Objects.equals(prompt, "help")) {
-                System.out.print(SET_TEXT_COLOR_BLUE);
-                System.out.println("Uhh idk lol");
-            } else {
-                if (state == State.PRELOGIN) {
-                    switch (prompt) {
-                        case "login" -> {
-                            this.state = State.POSTLOGIN;
-                            System.out.println("Dfaeadsf");
-                        }
-                        case "register" -> System.out.println("dasadff");
-                        default -> this.unknownCommand();
-                    }
-                    ;
-                } else if (state == State.POSTLOGIN) {
-                    switch (prompt) {
-                        case "login" -> this.state = State.GAMEPLAY;
-                        case "register" -> System.out.println("dasadff");
-                        default -> this.unknownCommand();
-                    }
-                    ;
-                } else if (state == State.GAMEPLAY) {
-                    prompt = "quit";
-
-                    var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-                    out.print(ERASE_SCREEN);
-                    var board = new ChessBoard();
-                    board.resetBoard();
-                    ChessUI.printBoard(board, ChessGame.TeamColor.BLACK);
-                    ChessUI.printBoard(board, ChessGame.TeamColor.WHITE);
-                }
+            String prompt = scanner.nextLine();
+            try {
+                result = client.eval(prompt);
+                System.out.print(SET_TEXT_COLOR_BLUE + result + "\n");
+            } catch (Throwable e) {
+                result = e.getMessage();
+                System.out.print(SET_TEXT_COLOR_RED + result + "\n");
             }
         }
 
         System.out.println("Bye bye, thank you so much for to playing my game!!");
     }
-
-    private void unknownCommand() {
-        System.out.print(SET_TEXT_COLOR_RED);
-        System.out.println("Unknown command!");
-        System.out.print(SET_TEXT_COLOR_BLUE);
-        System.out.println("type 'help' for list of commands.");
-    }
-
 }
