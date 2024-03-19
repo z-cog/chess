@@ -97,15 +97,14 @@ public class ChessClient {
             this.games.put(i, (GameData) gameList[i]);
             output.append(i).append(": ").append(((GameData) gameList[i]).gameName()).append("\n");
         }
-        System.out.println(output);
         return output.toString();
     }
 
     private String joinGame(String... params) throws Exception {
         if (params.length == 2) {
-            if (Objects.equals(params[0], "black") || Objects.equals(params[0], "white")) {
-                var color = (params[0].equals("white")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
-                var gameID = games.get(Integer.parseInt(params[1])).gameID();
+            if (Objects.equals(params[1], "black") || Objects.equals(params[1], "white")) {
+                var color = (params[1].equals("white")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+                var gameID = games.get(Integer.parseInt(params[0])).gameID();
                 String output = facade.joinGame(color, gameID);
                 this.state = State.GAMEPLAY;
                 return output;
