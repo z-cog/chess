@@ -11,13 +11,13 @@ import java.util.Objects;
 import static ui.EscapeSequences.ERASE_SCREEN;
 
 public class ChessClient {
-    private final ServerFacade server;
+    private final ServerFacade facade;
     private State state;
 
     private HashMap<Integer, String> games;
 
     public ChessClient(String serverUrl) {
-        server = new ServerFacade(serverUrl);
+        facade = new ServerFacade(serverUrl);
         this.state = State.PRELOGIN;
         this.games = new HashMap<>();
     }
@@ -58,56 +58,38 @@ public class ChessClient {
     }
 
     private String register(String... params) throws Exception {
-        try {
-            if (params.length == 3) {
-                System.out.print(Arrays.toString(params));
-                this.state = State.POSTLOGIN;
-                server.register(params[0], params[1], params[2]);
-                return "registered as " + params[0] + " at idk like 5:00pm?";
-            }
-            throw new Exception("Expected: register <username> <password> <email>");
-        } catch (Exception e) {
-            this.state = State.PRELOGIN;
-            throw e;
+        if (params.length == 3) {
+            System.out.print(Arrays.toString(params));
+            String message = facade.register(params[0], params[1], params[2]);
+            this.state = State.POSTLOGIN;
+            return message;
         }
+        throw new Exception("Expected: register <username> <password> <email>");
     }
 
     private String login(String... params) throws Exception {
-        try {
-            if (params.length == 2) {
-                System.out.print(Arrays.toString(params));
-                this.state = State.POSTLOGIN;
-                return "dfa";
-            }
-            throw new Exception("Expected: login <username> <password>");
-        } catch (Exception e) {
-            this.state = State.PRELOGIN;
-            throw e;
+        if (params.length == 2) {
+            System.out.print(Arrays.toString(params));
+            String message = facade.login(params[0], params[1]);
+            this.state = State.POSTLOGIN;
+            return message;
         }
+        throw new Exception("Expected: login <username> <password>");
     }
 
     private String logout() throws Exception {
-        try {
-            this.state = State.PRELOGIN;
-            return "success!";
-        } catch (Exception e) {
-            this.state = State.POSTLOGIN;
-            throw e;
-        }
+        String message = facade.logout();
+        this.state = State.PRELOGIN;
+        return message;
     }
 
     private String createGame(String... params) throws Exception {
-        try {
-            if (params.length == 1) {
-                System.out.print(Arrays.toString(params));
-                this.state = State.GAMEPLAY;
-                return "dfa";
-            }
-            throw new Exception("Expected: create <gameName>");
-        } catch (Exception e) {
-            this.state = State.POSTLOGIN;
-            throw e;
+        if (params.length == 1) {
+            String message = facade.createGame(params[0]);
+            this.state = State.GAMEPLAY;
+            return message;
         }
+        throw new Exception("Expected: create <gameName>");
     }
 
     private String listGames() throws Exception {
@@ -116,19 +98,19 @@ public class ChessClient {
         StringBuilder output = new StringBuilder();
         for (int i = 0; i < gameList.length; i++) {
             this.games.put(i, gameList[i]);
-            output.append(gameList[i]).append("\n");
+            output.append(i).append(": ").append(gameList[i]).append("\n");
         }
         return output.toString();
     }
 
     private String joinGame(String... params) throws Exception {
         try {
-            if (params.length == 1) {
+            if (params.length == 2) {
                 System.out.print(Arrays.toString(params));
                 this.state = State.GAMEPLAY;
                 return "dfa";
             }
-            throw new Exception("Expected: login <username> <password>");
+            throw new Exception("Expected: join <gameID> <color>");
         } catch (Exception e) {
             this.state = State.POSTLOGIN;
             throw e;

@@ -27,10 +27,47 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void registerTest() {
+    public void registerNewUser() {
         assertDoesNotThrow(() -> facade.register("bob", "bob", "bob"));
+    }
 
-        assertThrows(Exception.class, () -> facade.register("", "", "dasfeasdfea"));
+    @Test
+    public void registerExistingUser() {
+        assertDoesNotThrow(() -> facade.register("bob", "bob", "dasfeasdfea"));
+        assertThrows(Exception.class, () -> facade.register("bob", "bob", "dasfeasdfea"));
+    }
+
+    @Test
+    public void loginExistingUser() {
+        assertDoesNotThrow(() -> facade.register("bob", "bob", "dasfeasdfea"));
+        assertDoesNotThrow(() -> facade.login("bob", "dasfeasdfea"));
+    }
+
+    @Test
+    public void loginNonexistentUserThrows() {
+        assertThrows(Exception.class, () -> facade.login("uh idk", "please let me in"));
+    }
+
+    @Test
+    public void logoutExistingUser() {
+        assertDoesNotThrow(() -> facade.register("bob", "bob", "dasfeasdfea"));
+        assertDoesNotThrow(() -> facade.logout());
+    }
+
+    @Test
+    public void logoutNonexistentUserThrows() {
+        assertThrows(Exception.class, () -> facade.logout());
+    }
+
+    @Test
+    public void createNewGame() {
+        assertDoesNotThrow(() -> facade.register("Rupert", "bob@bobsbob.bob", "17bottlesofpop"));
+        assertDoesNotThrow(() -> facade.createGame("Rupert's Game"));
+    }
+
+    @Test
+    public void malformedGameRequestThrows() {
+        assertThrows(Exception.class, () -> facade.createGame(null));
     }
 
     @AfterAll

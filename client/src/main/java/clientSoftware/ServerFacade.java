@@ -17,49 +17,109 @@ public class ServerFacade {
         this.url = serverUrl;
     }
 
-    public void register(String username, String password, String email) throws Exception {
+    public String register(String username, String email, String password) throws Exception {
         URI uri = new URI(url + "/user");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod("POST");
 
-        // Specify that we are going to write out data
         http.setDoOutput(true);
 
-        // Write out a header
-        http.addRequestProperty("authorization", authToken);
-
-        // Write out the body
         var body = Map.of("username", username, "password", password, "email", email);
         try (var outputStream = http.getOutputStream()) {
             var jsonBody = new Gson().toJson(body);
             outputStream.write(jsonBody.getBytes());
         }
 
-        // Make the request
         http.connect();
 
-        // Output the response body
         try (InputStream respBody = http.getInputStream()) {
             InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-            System.out.println(new Gson().fromJson(inputStreamReader, Map.class));
+            var output = new Gson().fromJson(inputStreamReader, Map.class);
+            this.authToken = (String) output.get("authToken");
+            return "New user " + username + "successfully registered. Logged in.";
         }
     }
 
-    public void clear() throws Exception {
+    public String login(String username, String password) throws Exception {
+        URI uri = new URI(url + "/session");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+        http.setRequestMethod("POST");
+
+        http.setDoOutput(true);
+
+        var body = Map.of("username", username, "password", password);
+        try (var outputStream = http.getOutputStream()) {
+            var jsonBody = new Gson().toJson(body);
+            outputStream.write(jsonBody.getBytes());
+        }
+
+        http.connect();
+
+        try (InputStream respBody = http.getInputStream()) {
+            InputStreamReader inputStreamReader = new InputStreamReader(respBody);
+            var output = new Gson().fromJson(inputStreamReader, Map.class);
+            this.authToken = (String) output.get("authToken");
+
+            return "Logged in as " + username + ".";
+        }
+    }
+
+    public String logout() throws Exception {
+        URI uri = new URI(url + "/session");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+        http.setRequestMethod("DELETE");
+
+        http.setDoOutput(true);
+
+        http.addRequestProperty("authorization", authToken);
+
+        http.connect();
+
+        try (InputStream respBody = http.getInputStream()) {
+            InputStreamReader inputStreamReader = new InputStreamReader(respBody);
+            var output = new Gson().fromJson(inputStreamReader, Map.class);
+            this.authToken = (String) output.get("authToken");
+
+            return "Logged out successfully.";
+        }
+    }
+
+    public String createGame(String gameName) throws Exception {
+        URI uri = new URI(url + "/game");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+        http.setRequestMethod("POST");
+
+        http.setDoOutput(true);
+
+        http.addRequestProperty("authorization", authToken);
+
+        var body = Map.of("gameName", gameName);
+        try (var outputStream = http.getOutputStream()) {
+            var jsonBody = new Gson().toJson(body);
+            outputStream.write(jsonBody.getBytes());
+        }
+
+        http.connect();
+
+        try (InputStream respBody = http.getInputStream()) {
+            InputStreamReader inputStreamReader = new InputStreamReader(respBody);
+            return "Created new game " + gameName + ".";
+        }
+    }
+
+    public String clear() throws Exception {
         URI uri = new URI(url + "/db");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod("DELETE");
 
-        // Specify that we are going to write out data
-        http.setDoOutput(true);
+        http.setDoOutput(false);
 
-        // Make the request
         http.connect();
 
-        // Output the response body
         try (InputStream respBody = http.getInputStream()) {
             InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-            System.out.println(new Gson().fromJson(inputStreamReader, Map.class));
+            this.authToken = null;
+            return "Database cleared.";
         }
     }
 }
