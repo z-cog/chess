@@ -60,7 +60,7 @@ public class ChessClient {
 
     private String register(String... params) throws Exception {
         if (params.length == 3) {
-            String message = facade.register(params[0], params[1], params[2]);
+            String message = facade.register(params[0], params[2], params[1]);
             this.state = State.POSTLOGIN;
             return message;
         }
