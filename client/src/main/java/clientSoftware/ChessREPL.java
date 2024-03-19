@@ -13,7 +13,7 @@ public class ChessREPL {
 
     public void run() {
         System.out.print(SET_TEXT_COLOR_BLUE);
-        System.out.println("Hello welcome to the chess game");
+        System.out.println("Welcome to the Chess Client!");
 
         Scanner scanner = new Scanner(System.in);
 
@@ -32,7 +32,6 @@ public class ChessREPL {
                 System.out.print(SET_TEXT_COLOR_RED + result + "\n");
             }
         }
-
-        System.out.println("Bye bye, thank you so much for to playing my game!!");
+        System.out.println("Farewell!!");
     }
 }

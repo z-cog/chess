@@ -70,6 +70,19 @@ public class ServerFacadeTests {
         assertThrows(Exception.class, () -> facade.createGame(null));
     }
 
+    @Test
+    public void listGamesValidAuth() {
+        assertDoesNotThrow(() -> facade.register("Rupert", "bob@bobsbob.bob", "17bottlesofpop"));
+        assertDoesNotThrow(() -> facade.createGame("bob's world"));
+        assertDoesNotThrow(() -> facade.listGames());
+    }
+
+    @Test
+    public void listGamesInvalidAuth() {
+        assertThrows(Exception.class, () -> facade.listGames());
+    }
+
+
     @AfterAll
     static void stopServer() {
         server.stop();

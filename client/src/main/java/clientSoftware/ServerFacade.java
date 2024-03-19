@@ -1,11 +1,13 @@
 package clientSoftware;
 
 import com.google.gson.Gson;
+import model.GameData;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Map;
 
 public class ServerFacade {
@@ -81,6 +83,26 @@ public class ServerFacade {
             this.authToken = (String) output.get("authToken");
 
             return "Logged out successfully.";
+        }
+    }
+
+    public Object[] listGames() throws Exception {
+        record listGameResponse(GameData[] games) {
+        }
+        URI uri = new URI(url + "/game");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+        http.setRequestMethod("GET");
+
+        http.setDoOutput(true);
+
+        http.addRequestProperty("authorization", authToken);
+
+        http.connect();
+
+        try (InputStream respBody = http.getInputStream()) {
+            InputStreamReader inputStreamReader = new InputStreamReader(respBody);
+            var gameList = new Gson().fromJson(inputStreamReader, listGameResponse.class);
+            return gameList.games();
         }
     }
 

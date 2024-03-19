@@ -2,6 +2,7 @@ package clientSoftware;
 
 import chess.ChessBoard;
 import chess.ChessGame;
+import model.GameData;
 import ui.ChessUI;
 
 import java.util.Arrays;
@@ -14,7 +15,7 @@ public class ChessClient {
     private final ServerFacade facade;
     private State state;
 
-    private HashMap<Integer, String> games;
+    private final HashMap<Integer, GameData> games;
 
     public ChessClient(String serverUrl) {
         facade = new ServerFacade(serverUrl);
@@ -85,21 +86,20 @@ public class ChessClient {
 
     private String createGame(String... params) throws Exception {
         if (params.length == 1) {
-            String message = facade.createGame(params[0]);
-            this.state = State.GAMEPLAY;
-            return message;
+            return facade.createGame(params[0]);
         }
         throw new Exception("Expected: create <gameName>");
     }
 
     private String listGames() throws Exception {
         this.games.clear();
-        var gameList = new String[]{"fea", "feaadsf", "dfea"};
+        var gameList = facade.listGames();
         StringBuilder output = new StringBuilder();
         for (int i = 0; i < gameList.length; i++) {
-            this.games.put(i, gameList[i]);
-            output.append(i).append(": ").append(gameList[i]).append("\n");
+            this.games.put(i, (GameData) gameList[i]);
+            output.append(i).append(": ").append(((GameData) gameList[i]).gameName()).append("\n");
         }
+        System.out.println(output);
         return output.toString();
     }
 
@@ -129,6 +129,10 @@ public class ChessClient {
             this.state = State.POSTLOGIN;
             throw e;
         }
+    }
+
+    private String clear() throws Exception {
+        return facade.clear();
     }
 
     private String help() {
