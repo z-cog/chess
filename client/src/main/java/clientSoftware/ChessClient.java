@@ -60,7 +60,6 @@ public class ChessClient {
 
     private String register(String... params) throws Exception {
         if (params.length == 3) {
-            System.out.print(Arrays.toString(params));
             String message = facade.register(params[0], params[1], params[2]);
             this.state = State.POSTLOGIN;
             return message;
@@ -70,7 +69,6 @@ public class ChessClient {
 
     private String login(String... params) throws Exception {
         if (params.length == 2) {
-            System.out.print(Arrays.toString(params));
             String message = facade.login(params[0], params[1]);
             this.state = State.POSTLOGIN;
             return message;
@@ -104,31 +102,26 @@ public class ChessClient {
     }
 
     private String joinGame(String... params) throws Exception {
-        try {
-            if (params.length == 2) {
-                System.out.print(Arrays.toString(params));
+        if (params.length == 2) {
+            if (Objects.equals(params[0], "black") || Objects.equals(params[0], "white")) {
+                var color = (params[0].equals("white")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+                var gameID = games.get(Integer.parseInt(params[1])).gameID();
+                String output = facade.joinGame(color, gameID);
                 this.state = State.GAMEPLAY;
-                return "dfa";
+                return output;
             }
-            throw new Exception("Expected: join <gameID> <color>");
-        } catch (Exception e) {
-            this.state = State.POSTLOGIN;
-            throw e;
         }
+        throw new Exception("Expected: join <gameID> black|white");
     }
 
     private String observeGame(String... params) throws Exception {
-        try {
-            if (params.length == 1) {
-                System.out.print(Arrays.toString(params));
-                this.state = State.GAMEPLAY;
-                return "Observing game ";
-            }
-            throw new Exception("Expected: observe <ID>");
-        } catch (Exception e) {
-            this.state = State.POSTLOGIN;
-            throw e;
+        if (params.length == 1) {
+            var gameID = games.get(Integer.parseInt(params[0])).gameID();
+            String output = facade.joinGame(null, gameID);
+            this.state = State.GAMEPLAY;
+            return output;
         }
+        throw new Exception("Expected: observe <ID>");
     }
 
     private String clear() throws Exception {

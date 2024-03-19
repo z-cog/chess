@@ -1,5 +1,6 @@
 package clientTests;
 
+import chess.ChessGame;
 import clientSoftware.ServerFacade;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -80,6 +81,30 @@ public class ServerFacadeTests {
     @Test
     public void listGamesInvalidAuth() {
         assertThrows(Exception.class, () -> facade.listGames());
+    }
+
+
+    @Test
+    public void joinValidGame() {
+        assertDoesNotThrow(() -> facade.register("Da-King", "darealking@hotmail.com", "amongus"));
+        assertDoesNotThrow(() -> facade.createGame("I'm waking up"));
+        assertDoesNotThrow(() -> facade.createGame("to Ash and Dust"));
+        assertDoesNotThrow(() -> facade.createGame("I wipe my brow and I"));
+        assertDoesNotThrow(() -> facade.createGame("Among us"));
+        assertDoesNotThrow(() -> facade.joinGame(ChessGame.TeamColor.BLACK, 1));
+    }
+
+    @Test
+    public void joinAsObserver() {
+        assertDoesNotThrow(() -> facade.register("Muscle Man", "Whoknowwhoelse", "is tired of writing tests cases?"));
+        assertDoesNotThrow(() -> facade.createGame("MY MOM"));
+        assertDoesNotThrow(() -> facade.joinGame(null, 1));
+    }
+
+    @Test
+    public void joinInvalidGame() {
+        assertDoesNotThrow(() -> facade.register("Da-King", "darealking@hotmail.com", "amongus"));
+        assertThrows(Exception.class, () -> facade.joinGame(ChessGame.TeamColor.BLACK, 435));
     }
 
 
