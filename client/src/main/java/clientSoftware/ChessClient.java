@@ -29,7 +29,7 @@ public class ChessClient {
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         if (Objects.equals(prompt, "quit")) {
             return prompt;
-        } else if (Objects.equals(prompt, "help")) {
+        } else if (Objects.equals(prompt, "help") || Objects.equals(prompt, "")) {
             return help();
         } else {
             if (state == State.PRELOGIN) {
@@ -130,18 +130,18 @@ public class ChessClient {
     private String help() {
         if (state == State.PRELOGIN) {
             return """
-                    - login
-                    - register
+                    - login <username> <password>
+                    - register <username> <password> <email>
                     - help
                     - quit
                     """;
         } else if (state == State.POSTLOGIN) {
             return """
                     - logout
-                    - create
+                    - create <gameName>
                     - list
-                    - join
-                    - observe
+                    - join <gameID> black|white
+                    - observe <gameID>
                     - help
                     - quit
                     """;
