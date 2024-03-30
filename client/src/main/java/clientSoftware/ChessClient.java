@@ -1,6 +1,5 @@
 package clientSoftware;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPosition;
 import clientSoftware.webSocket.ServerMessageHandler;
@@ -167,23 +166,23 @@ public class ChessClient implements ServerMessageHandler {
     }
 
     private ChessPosition convertToPosition(String string) {
-        int row = convertToInt(string.toLowerCase().charAt(1));
-        int col = convertToInt(string.toLowerCase().charAt(0));
+        int row = convertToInt(string.charAt(1));
+        int col = convertToInt(string.charAt(0));
         return new ChessPosition(row, col);
     }
 
     private Integer convertToInt(Character c) {
-        return switch (c) {
-            case ('b' | '2') -> 2;
-            case ('c' | '3') -> 3;
-            case ('d' | '4') -> 4;
-            case ('e' | '5') -> 5;
-            case ('f' | '6') -> 6;
-            case ('g' | '7') -> 7;
-            case ('h' | '8') -> 8;
-            default -> 1;
-        };
+        if ((96 < c) && (c < 105)) {
+            return c - 96;
+        } else if ((64 < c) && (c < 73)) {
+            return c - 64;
+        } else if ((48 < c) && (c < 57)) {
+            return c - 48;
+        } else {
+            return 0;
+        }
     }
+
 
     private String help() {
         if (state == State.PRELOGIN) {
