@@ -1,7 +1,6 @@
 package clientSoftware;
 
 import chess.ChessGame;
-import clientSoftware.webSocket.ServerMessageHandler;
 import ui.ChessUI;
 import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.ServerMessage;
@@ -11,13 +10,11 @@ import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
-public class ChessREPL implements ServerMessageHandler {
+public class ChessREPL {
     private final ChessClient client;
-    private ChessGame.TeamColor color;
 
     public ChessREPL(String serverUrl) {
         this.client = new ChessClient(serverUrl);
-        this.color = ChessGame.TeamColor.WHITE;
     }
 
     public void run() {
@@ -42,23 +39,5 @@ public class ChessREPL implements ServerMessageHandler {
             }
         }
         System.out.println("Farewell!!");
-    }
-
-    public void notify(ServerMessage message) {
-        var type = message.getServerMessageType();
-        if (type == ServerMessage.ServerMessageType.LOAD_GAME) {
-            ChessGame game = ((LoadGame) message).getGame();
-            ChessUI.printBoard(game.getBoard(), color);
-        } else {
-            var messageColor = SET_TEXT_COLOR_WHITE;
-            if (type == ServerMessage.ServerMessageType.ERROR) {
-                messageColor = SET_TEXT_COLOR_RED;
-            }
-            System.out.println(messageColor + ((ServerNotification) message).getMessage());
-        }
-    }
-
-    public void setTeam(ChessGame.TeamColor color) {
-        this.color = color;
     }
 }

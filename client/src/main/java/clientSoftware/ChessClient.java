@@ -2,25 +2,33 @@ package clientSoftware;
 
 import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessPosition;
+import clientSoftware.webSocket.ServerMessageHandler;
 import model.GameData;
 import ui.ChessUI;
+import webSocketMessages.serverMessages.LoadGame;
+import webSocketMessages.serverMessages.ServerMessage;
+import webSocketMessages.serverMessages.ServerNotification;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
-import static ui.EscapeSequences.ERASE_SCREEN;
+import static ui.EscapeSequences.*;
 
-public class ChessClient {
+public class ChessClient implements ServerMessageHandler {
     private final ServerFacade facade;
     private State state;
-
+    private ChessGame.TeamColor color;
+    private ChessGame currentGame;
     private final HashMap<Integer, GameData> games;
 
     public ChessClient(String serverUrl) {
         facade = new ServerFacade(serverUrl);
         this.state = State.PRELOGIN;
         this.games = new HashMap<>();
+        this.color = null;
+        this.currentGame = null;
     }
 
     public String eval(String input) throws Exception {
@@ -48,12 +56,14 @@ public class ChessClient {
                     default -> "Unknown command! Type 'help' for list of commands.\n";
                 };
             } else {
-                System.out.print(ERASE_SCREEN);
-                var board = new ChessBoard();
-                board.resetBoard();
-                ChessUI.printBoard(board, ChessGame.TeamColor.BLACK);
-                ChessUI.printBoard(board, ChessGame.TeamColor.WHITE);
-                return "quit";
+                return switch (prompt) {
+                    case "redraw" -> redrawBoard();
+                    case "highlight" -> highlight(params);
+                    case "move" -> makeMove(params);
+                    case "leave" -> leaveGame();
+                    case "resign" -> resignGame();
+                    default -> "Unknown command! Type 'help' for list of commands.\n";
+                };
             }
         }
     }
@@ -106,6 +116,7 @@ public class ChessClient {
                 var color = (params[1].equals("white")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
                 var gameID = games.get(Integer.parseInt(params[0])).gameID();
                 String output = facade.joinGame(color, gameID);
+                this.color = color;
                 this.state = State.GAMEPLAY;
                 return output;
             }
@@ -123,8 +134,55 @@ public class ChessClient {
         throw new Exception("Expected: observe <ID>");
     }
 
+    private String redrawBoard() {
+        var board = this.currentGame.getBoard();
+        ChessUI.printBoard(board, this.color);
+        return "";
+    }
+
+    private String highlight(String[] params) throws Exception {
+        if (params.length == 1 && params[0].length() == 2) {
+            var board = this.currentGame.getBoard();
+            var position = convertToPosition(params[0]);
+            ChessUI.printBoard(board, this.color);
+            return "";
+        }
+        throw new Exception("Expected: highlight <piecePosition>");
+    }
+
+    private String makeMove(String[] params) throws Exception {
+        return "";
+    }
+
+    private String leaveGame() {
+        return "";
+    }
+
+    private String resignGame() {
+        return "";
+    }
+
     private String clear() throws Exception {
         return facade.clear();
+    }
+
+    private ChessPosition convertToPosition(String string) {
+        int row = convertToInt(string.toLowerCase().charAt(1));
+        int col = convertToInt(string.toLowerCase().charAt(0));
+        return new ChessPosition(row, col);
+    }
+
+    private Integer convertToInt(Character c) {
+        return switch (c) {
+            case ('b' | '2') -> 2;
+            case ('c' | '3') -> 3;
+            case ('d' | '4') -> 4;
+            case ('e' | '5') -> 5;
+            case ('f' | '6') -> 6;
+            case ('g' | '7') -> 7;
+            case ('h' | '8') -> 8;
+            default -> 1;
+        };
     }
 
     private String help() {
@@ -146,7 +204,30 @@ public class ChessClient {
                     - quit
                     """;
         } else {
-            return "- begin";
+            return """
+                    - redraw
+                    - highlight <piecePosition>
+                    - move <startPosition> <endPosition>
+                    - leave
+                    - resign
+                    - help
+                    - quit
+                    """;
+        }
+    }
+
+    public void notify(ServerMessage message) {
+        var type = message.getServerMessageType();
+        if (type == ServerMessage.ServerMessageType.LOAD_GAME) {
+            ChessGame game = ((LoadGame) message).getGame();
+            this.currentGame = game;
+            ChessUI.printBoard(game.getBoard(), color);
+        } else {
+            var messageColor = SET_TEXT_COLOR_WHITE;
+            if (type == ServerMessage.ServerMessageType.ERROR) {
+                messageColor = SET_TEXT_COLOR_RED;
+            }
+            System.out.println(messageColor + ((ServerNotification) message).getMessage());
         }
     }
 }
