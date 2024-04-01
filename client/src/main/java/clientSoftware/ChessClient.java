@@ -43,6 +43,7 @@ public class ChessClient implements ServerMessageHandler {
                 return switch (prompt) {
                     case "login" -> login(params);
                     case "register" -> register(params);
+                    case "letitallburn" -> clear();
                     default -> "Unknown command! Type 'help' for list of commands.\n";
                 };
             } else if (state == State.POSTLOGIN) {

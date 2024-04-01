@@ -4,6 +4,7 @@ import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 
 import static ui.EscapeSequences.*;
 
@@ -18,14 +19,27 @@ public class ChessUI {
 
         out.print(ERASE_SCREEN);
 
-        drawChessBoard(out, board, color);
+        drawChessBoard(out, board, color, null, null);
 
         out.print(SET_BG_COLOR_BLACK);
         out.print(SET_TEXT_COLOR_WHITE);
 
     }
 
-    private static void drawChessBoard(PrintStream out, ChessBoard board, ChessGame.TeamColor color) {
+    public static void highlight(ChessGame game, ChessPosition selectedPiece, ChessGame.TeamColor color) {
+        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+
+        out.print(ERASE_SCREEN);
+
+        var board = game.getBoard();
+        var moves = game.validMoves(selectedPiece);
+        drawChessBoard(out, board, color, moves, selectedPiece);
+
+        out.print(SET_BG_COLOR_BLACK);
+        out.print(SET_TEXT_COLOR_WHITE);
+    }
+
+    private static void drawChessBoard(PrintStream out, ChessBoard board, ChessGame.TeamColor color, Collection<ChessMove> moves, ChessPosition selectedPiece) {
         String[] header = {EMPTY, "a", "b", "c", "d", "e", "f", "g", "h", EMPTY};
         if (color == ChessGame.TeamColor.BLACK) {
             header = new String[]{EMPTY, "h", "g", "f", "e", "d", "c", "b", "a", EMPTY};
@@ -49,13 +63,27 @@ public class ChessUI {
 
             for (int j = 9 - begin; (0 < j) && (j < BOARD_SIZE_IN_SQUARES + 1); j += (-1) * order) {
                 out.print(SET_TEXT_COLOR_GREEN);
-                if (squareColor) {
-                    out.print(SET_BG_COLOR_WHITE);
+                var currentSquare = new ChessPosition(i, j);
+                if (currentSquare.equals(selectedPiece)) {
+                    out.print(SET_BG_COLOR_YELLOW);
                 } else {
-                    out.print(SET_BG_COLOR_BLACK);
+                    boolean validMove = isValidMove(moves, selectedPiece, currentSquare);
+                    if (squareColor) {
+                        if (validMove) {
+                            out.print(SET_BG_COLOR_GREEN);
+                        } else {
+                            out.print(SET_BG_COLOR_WHITE);
+                        }
+                    } else {
+                        if (validMove) {
+                            out.print(SET_BG_COLOR_DARK_GREEN);
+                        } else {
+                            out.print(SET_BG_COLOR_BLACK);
+                        }
+                    }
                 }
                 out.print(EMPTY.repeat(SQUARE_SIZE_IN_CHARS / 2));
-                printPiece(out, board.getPiece(new ChessPosition(i, j)));
+                printPiece(out, board.getPiece(currentSquare));
                 out.print(EMPTY.repeat(SQUARE_SIZE_IN_CHARS / 2));
                 squareColor = !squareColor;
             }
@@ -76,6 +104,18 @@ public class ChessUI {
 
         printHeader(out, header);
         out.println();
+    }
+
+    private static boolean isValidMove(Collection<ChessMove> moves, ChessPosition selectedPiece, ChessPosition currentSquare) {
+        boolean validMove = false;
+        if (moves != null) {
+            validMove = (moves.contains(new ChessMove(selectedPiece, currentSquare, null)) ||
+                    moves.contains(new ChessMove(selectedPiece, currentSquare, ChessPiece.PieceType.QUEEN)) ||
+                    moves.contains(new ChessMove(selectedPiece, currentSquare, ChessPiece.PieceType.PAWN)) ||
+                    moves.contains(new ChessMove(selectedPiece, currentSquare, ChessPiece.PieceType.ROOK)) ||
+                    moves.contains(new ChessMove(selectedPiece, currentSquare, ChessPiece.PieceType.BISHOP)));
+        }
+        return validMove;
     }
 
     private static void printHeader(PrintStream out, String[] header) {
@@ -121,7 +161,7 @@ public class ChessUI {
         out.print(output);
     }
 
-    static void setBlack(PrintStream out) {
+    private static void setBlack(PrintStream out) {
         out.print(SET_BG_COLOR_BLACK);
         out.print(SET_TEXT_COLOR_BLACK);
     }
