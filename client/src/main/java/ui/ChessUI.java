@@ -31,8 +31,9 @@ public class ChessUI {
 
         out.print(ERASE_SCREEN);
 
-        var board = game.getBoard();
         var moves = game.validMoves(selectedPiece);
+        var board = game.getBoard();
+        
         drawChessBoard(out, board, color, moves, selectedPiece);
 
         out.print(SET_BG_COLOR_BLACK);

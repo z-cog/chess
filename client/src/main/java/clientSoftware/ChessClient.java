@@ -142,9 +142,8 @@ public class ChessClient implements ServerMessageHandler {
 
     private String highlight(String[] params) throws Exception {
         if (params.length == 1 && params[0].length() == 2) {
-            var board = this.currentGame.getBoard();
             var position = convertToPosition(params[0]);
-            ChessUI.printBoard(board, this.color);
+            ChessUI.highlight(this.currentGame, position, this.color);
             return "";
         }
         throw new Exception("Expected: highlight <piecePosition>");
@@ -166,13 +165,13 @@ public class ChessClient implements ServerMessageHandler {
         return facade.clear();
     }
 
-    private ChessPosition convertToPosition(String string) {
+    private ChessPosition convertToPosition(String string) throws Exception {
         int row = convertToInt(string.charAt(1));
         int col = convertToInt(string.charAt(0));
         return new ChessPosition(row, col);
     }
 
-    private Integer convertToInt(Character c) {
+    private Integer convertToInt(Character c) throws Exception {
         if ((96 < c) && (c < 105)) {
             return c - 96;
         } else if ((64 < c) && (c < 73)) {
@@ -180,7 +179,7 @@ public class ChessClient implements ServerMessageHandler {
         } else if ((48 < c) && (c < 57)) {
             return c - 48;
         } else {
-            return 0;
+            throw new Exception("Invalid format for chess position\nExample: a1");
         }
     }
 
