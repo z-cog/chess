@@ -3,6 +3,7 @@ package clientSoftware;
 import chess.ChessGame;
 import chess.ChessPosition;
 import clientSoftware.webSocket.ServerMessageHandler;
+import clientSoftware.webSocket.WebSocketFacade;
 import model.GameData;
 import ui.ChessUI;
 import webSocketMessages.serverMessages.LoadGame;
@@ -17,13 +18,18 @@ import static ui.EscapeSequences.*;
 
 public class ChessClient implements ServerMessageHandler {
     private final ServerFacade facade;
+    private WebSocketFacade ws;
+    private String url;
     private State state;
     private ChessGame.TeamColor color;
     private ChessGame currentGame;
+    private int gameID;
     private final HashMap<Integer, GameData> games;
 
     public ChessClient(String serverUrl) {
-        facade = new ServerFacade(serverUrl);
+        this.facade = new ServerFacade(serverUrl);
+        this.ws = null;
+        this.url = serverUrl;
         this.state = State.PRELOGIN;
         this.games = new HashMap<>();
         this.color = null;
@@ -117,6 +123,9 @@ public class ChessClient implements ServerMessageHandler {
                 var gameID = games.get(Integer.parseInt(params[0])).gameID();
                 String output = facade.joinGame(color, gameID);
                 this.color = color;
+                this.gameID = gameID;
+                this.ws = new WebSocketFacade(this.url, facade.authToken, this);
+                ws.joinPlayer(gameID, color);
                 this.state = State.GAMEPLAY;
                 return output;
             }

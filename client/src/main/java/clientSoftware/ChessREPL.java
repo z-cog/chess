@@ -1,11 +1,5 @@
 package clientSoftware;
 
-import chess.ChessGame;
-import ui.ChessUI;
-import webSocketMessages.serverMessages.LoadGame;
-import webSocketMessages.serverMessages.ServerMessage;
-import webSocketMessages.serverMessages.ServerNotification;
-
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
