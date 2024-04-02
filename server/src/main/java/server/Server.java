@@ -2,10 +2,8 @@ package server;
 
 import com.google.gson.Gson;
 import dataAccess.*;
-import service.BadRequestException;
-import service.ServicesDaemon;
-import service.UnauthorizedUserException;
-import service.UserTakenException;
+import server.WebSocket.WebSocketHandler;
+import service.*;
 import spark.*;
 
 import java.util.Map;
@@ -15,6 +13,7 @@ public class Server {
     GameDAO games;
     UserDAO user;
     ServicesDaemon service;
+    WebSocketHandler ws;
 
     public Server() {
         try {
@@ -22,6 +21,7 @@ public class Server {
             games = new SQLGameDAO();
             user = new SQLUserDAO();
             service = new ServicesDaemon(auth, games, user);
+            ws = new WebSocketHandler(new WebSocketServices(auth, games, user));
         } catch (Exception e) {
             System.out.println("Error: Server failed to comple" + e.getMessage());
         }
@@ -32,6 +32,8 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
+        Spark.webSocket("/connect", ws);
+        
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
@@ -40,6 +42,7 @@ public class Server {
         Spark.get("/game", this::listGames);
         Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
+
 
         Spark.notFound((req, res) -> {
             var msg = String.format("[%s] %s not found", req.requestMethod(), req.pathInfo());
