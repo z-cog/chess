@@ -49,6 +49,15 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
+    public void joinObserver(int gameID) throws Exception {
+        try {
+            var action = new JoinObserver(this.authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+        } catch (Exception e) {
+            throw new Exception("Error: problem observing game via WebSocket");
+        }
+    }
+
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }

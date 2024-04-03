@@ -28,6 +28,7 @@ public class WebSocketHandler {
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
         switch (command.getCommandType()) {
             case JOIN_PLAYER -> joinPlayer(session, new Gson().fromJson(message, JoinPlayer.class));
+            case JOIN_OBSERVER -> joinObserver(session, new Gson().fromJson(message, JoinObserver.class));
         }
     }
 
@@ -55,6 +56,28 @@ public class WebSocketHandler {
 
             } else {
                 var error = new ServerErrorNotification("Error: color reserved.");
+                cm.notifyRoot(gameID, authToken, error);
+            }
+        } catch (Exception e) {
+            var message = new ServerErrorNotification("Error:" + e.getMessage());
+            cm.notifyRoot(gameID, authToken, message);
+        }
+    }
+
+    private void joinObserver(Session session, JoinObserver cmd) throws Exception {
+        int gameID = cmd.getGameID();
+        String authToken = cmd.getAuthString();
+        cm.add(gameID, authToken, session);
+        try {
+            String username = service.authToUser(authToken);
+            var gameData = service.getGameData(gameID);
+            if (gameData.game() != null) {
+                var message = new LoadGame(gameData.game());
+                cm.notifyRoot(gameID, authToken, message);
+                var notification = new ServerNotification(username + " joined as observer.");
+                cm.broadcast(gameID, authToken, notification);
+            } else {
+                var error = new ServerErrorNotification("Error: game does not exist.");
                 cm.notifyRoot(gameID, authToken, error);
             }
         } catch (Exception e) {

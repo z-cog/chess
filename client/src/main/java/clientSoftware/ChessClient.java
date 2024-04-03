@@ -1,6 +1,8 @@
 package clientSoftware;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import clientSoftware.webSocket.ServerMessageHandler;
 import clientSoftware.webSocket.WebSocketFacade;
@@ -135,6 +137,9 @@ public class ChessClient implements ServerMessageHandler {
         if (params.length == 1) {
             var gameID = games.get(Integer.parseInt(params[0])).gameID();
             String output = facade.joinGame(null, gameID);
+            this.color = ChessGame.TeamColor.WHITE;
+            this.ws = new WebSocketFacade(this.url, facade.authToken, this);
+            ws.joinObserver(gameID);
             this.state = State.GAMEPLAY;
             return output;
         }
@@ -157,7 +162,26 @@ public class ChessClient implements ServerMessageHandler {
     }
 
     private String makeMove(String[] params) throws Exception {
-        return "";
+        if ((params.length == 2 || params.length == 3) && params[0].length() == 2 && params[1].length() == 2) {
+            var start = convertToPosition(params[0]);
+            var end = convertToPosition(params[1]);
+            ChessPiece.PieceType promotionPiece = null;
+
+            if (params.length == 3) {
+                switch (params[2]) {
+                    case "queen" -> promotionPiece = ChessPiece.PieceType.QUEEN;
+                    case "knight" -> promotionPiece = ChessPiece.PieceType.KNIGHT;
+                    case "rook" -> promotionPiece = ChessPiece.PieceType.ROOK;
+                    case "bishop" -> promotionPiece = ChessPiece.PieceType.BISHOP;
+                }
+            }
+            var move = new ChessMove(start, end, promotionPiece);
+            
+            return "";
+        }
+        throw new Exception("Expected: move <startPosition> <endPosition> <promotionPiece>\n" +
+                "Where: promotionPiece = queen|knight|bishop|rook|none\n" +
+                "       default: none.");
     }
 
     private String leaveGame() {
