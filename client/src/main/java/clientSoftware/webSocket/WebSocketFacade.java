@@ -3,6 +3,7 @@ package clientSoftware.webSocket;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import webSocketMessages.serverMessages.ServerMessage;
+import webSocketMessages.userCommands.*;
 
 import javax.websocket.*;
 import java.net.URI;
@@ -24,6 +25,7 @@ public class WebSocketFacade extends Endpoint {
             this.session = container.connectToServer(this, uri);
 
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+                @Override
                 public void onMessage(String message) {
                     ServerMessage response = new Gson().fromJson(message, ServerMessage.class);
                     client.notify(response);
@@ -36,7 +38,8 @@ public class WebSocketFacade extends Endpoint {
 
     public void joinPlayer(int gameID, ChessGame.TeamColor color) throws Exception {
         try {
-            System.out.println("yoooo it broken");
+            var action = new JoinPlayer(this.authToken, gameID, color);
+            this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (Exception e) {
             throw new Exception("Error: problem joining game via WebSocket");
         }

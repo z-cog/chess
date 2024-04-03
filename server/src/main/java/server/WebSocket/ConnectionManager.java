@@ -36,7 +36,7 @@ public class ConnectionManager {
                 removeList.add(c);
             }
         }
-        // Clean up any connections that were left open.
+
         for (var c : removeList) {
             currentIDConnection.remove(c.authToken);
         }

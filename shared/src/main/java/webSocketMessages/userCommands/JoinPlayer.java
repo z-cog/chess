@@ -1,12 +1,11 @@
 package webSocketMessages.userCommands;
 
 import chess.ChessGame;
+import com.google.gson.Gson;
 
 public class JoinPlayer extends UserGameCommand {
 
-    protected CommandType commandType;
     private final int gameID;
-
     private final ChessGame.TeamColor playerColor;
 
     public JoinPlayer(String authToken, int gameID, ChessGame.TeamColor playerColor) {

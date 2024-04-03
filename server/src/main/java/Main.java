@@ -10,22 +10,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Main {
     public static void main(String[] args) {
 
-//        var server = new Server();
-//        var port = server.run(8080);
-//        System.out.println("Started test HTTP server on " + port);
-//
-//        var scanner = new Scanner(System.in);
-//        var yo = scanner.nextLine();
-//
-//        server.stop();
+        var server = new Server();
+        var port = server.run(8080);
+        System.out.println("Started test HTTP server on " + port);
 
-        var yo = new ConnectionManager();
+        var scanner = new Scanner(System.in);
+        var yo = scanner.nextLine();
 
-        ConcurrentHashMap<Integer, HashMap<String, Boolean>> connections = new ConcurrentHashMap<>();
-        connections.computeIfAbsent(5, k -> new HashMap<>());
-        var curr = connections.get(5);
-
-        curr.put("sdaf", true);
-        curr.remove("sdaf");
+        server.stop();
     }
 }

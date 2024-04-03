@@ -3,7 +3,6 @@ package webSocketMessages.userCommands;
 import chess.ChessMove;
 
 public class MakeMove extends UserGameCommand {
-    protected UserGameCommand.CommandType commandType;
     private final int gameID;
     private final ChessMove move;
 
