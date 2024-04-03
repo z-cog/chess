@@ -68,6 +68,16 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
+    public void leaveGame(int gameID) throws Exception {
+        try {
+            var action = new Leave(authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+            this.session.close();
+        } catch (Exception e) {
+            throw new Exception("Error: problem disconnecting WebSocket.");
+        }
+    }
+
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }

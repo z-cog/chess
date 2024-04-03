@@ -31,9 +31,10 @@ public class ChessClient implements ServerMessageHandler {
         this.ws = null;
         this.url = serverUrl;
         this.state = State.PRELOGIN;
-        this.games = new HashMap<>();
         this.color = null;
         this.currentGame = null;
+        this.gameID = -3;
+        this.games = new HashMap<>();
     }
 
     public String eval(String input) throws Exception {
@@ -184,8 +185,14 @@ public class ChessClient implements ServerMessageHandler {
                 "       default: none.");
     }
 
-    private String leaveGame() {
-        return "";
+    private String leaveGame() throws Exception {
+        ws.leaveGame(gameID);
+        this.color = null;
+        this.currentGame = null;
+        this.gameID = -3;
+        this.state = State.POSTLOGIN;
+        this.ws = null;
+        return "Disconnected from websocket";
     }
 
     private String resignGame() {

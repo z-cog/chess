@@ -35,8 +35,8 @@ public class WebSocketServices {
         return currentGame;
     }
 
-    public void updateGame(ChessGame game, GameData data) throws DataAccessException {
-        GameData updatedGameData = new GameData(data.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName(), game);
+    public void updateGame(GameData data, ChessGame game, String whiteUsername, String blackUsername) throws DataAccessException {
+        GameData updatedGameData = new GameData(data.gameID(), whiteUsername, blackUsername, data.gameName(), game);
         games.updateGame(updatedGameData);
     }
 }

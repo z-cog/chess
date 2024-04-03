@@ -31,6 +31,7 @@ public class WebSocketHandler {
             case JOIN_PLAYER -> joinPlayer(session, new Gson().fromJson(message, JoinPlayer.class));
             case JOIN_OBSERVER -> joinObserver(session, new Gson().fromJson(message, JoinObserver.class));
             case MAKE_MOVE -> makeMove(session, new Gson().fromJson(message, MakeMove.class));
+            case LEAVE -> leaveGame(session, new Gson().fromJson(message, Leave.class));
         }
     }
 
@@ -102,7 +103,7 @@ public class WebSocketHandler {
                 if ((piece.getTeamColor() == ChessGame.TeamColor.WHITE && Objects.equals(username, gameData.whiteUsername())) ||
                         (piece.getTeamColor() == ChessGame.TeamColor.BLACK && Objects.equals(username, gameData.blackUsername()))) {
                     currentGame.makeMove(move);
-                    service.updateGame(currentGame, gameData);
+                    service.updateGame(gameData, currentGame, gameData.whiteUsername(), gameData.blackUsername());
 
                     var message = new LoadGame(currentGame);
                     cm.broadcast(gameID, null, message);
@@ -134,6 +135,28 @@ public class WebSocketHandler {
 
         } catch (Exception e) {
             var message = new ServerErrorNotification("Error: " + e.getMessage());
+            cm.notifyRoot(gameID, authToken, message);
+        }
+    }
+
+    private void leaveGame(Session session, Leave cmd) throws Exception {
+        int gameID = cmd.getGameID();
+        String authToken = cmd.getAuthString();
+        try {
+            String username = service.authToUser(authToken);
+            var gameData = service.getGameData(gameID);
+            if (Objects.equals(username, gameData.whiteUsername())) {
+                service.updateGame(gameData, gameData.game(), "", gameData.blackUsername());
+            } else if (Objects.equals(username, gameData.blackUsername())) {
+                service.updateGame(gameData, gameData.game(), gameData.whiteUsername(), "");
+            }
+            cm.remove(gameID, authToken);
+
+            var message = new ServerNotification(username + " left the game.");
+            cm.broadcast(gameID, null, message);
+
+        } catch (Exception e) {
+            var message = new ServerErrorNotification("Error:" + e.getMessage() + "\n somehow the code failed to close a websocket connection,\nwhich is really funny not gonna lie.");
             cm.notifyRoot(gameID, authToken, message);
         }
     }

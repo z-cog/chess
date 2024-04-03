@@ -16,8 +16,11 @@ public class ChessGame {
 
     private final HashMap<TeamColor, ChessPosition> kingPos;
 
+    private boolean gameOver;
+
     public ChessGame() {
         turn = TeamColor.WHITE; //first turn is always white.
+        gameOver = false;
         board = new ChessBoard();
         kingPos = new HashMap<>();
         kingPos.put(TeamColor.WHITE, null);
@@ -120,7 +123,9 @@ public class ChessGame {
         }
         var validMoves = validMoves(start);
         if (validMoves != null && validMoves.contains(move)) {
-
+            if (gameOver) {
+                throw new InvalidMoveException("The game is over!");
+            }
             board.movePiece(move);
             if (getTeamTurn() == TeamColor.WHITE) {
                 setTeamTurn(TeamColor.BLACK);
@@ -206,5 +211,9 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return this.board;
+    }
+
+    public void setGameOver(boolean val) {
+        gameOver = val;
     }
 }
