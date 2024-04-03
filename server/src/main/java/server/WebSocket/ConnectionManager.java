@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.jetty.websocket.api.Session;
+import service.UnauthorizedUserException;
 import webSocketMessages.serverMessages.ServerMessage;
 
 public class ConnectionManager {
@@ -20,6 +21,12 @@ public class ConnectionManager {
     public void remove(int gameID, String authToken) {
         if (connections.get(gameID) != null) {
             connections.get(gameID).remove(authToken);
+        }
+    }
+
+    public void check(int gameID, String authToken, Session session) throws UnauthorizedUserException {
+        if ((connections.get(gameID).get(authToken) == null) || (connections.get(gameID).get(authToken).session != session)) {
+            throw new UnauthorizedUserException("auth handshake failed, session invalid.");
         }
     }
 

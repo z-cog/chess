@@ -1,6 +1,7 @@
 package clientSoftware.webSocket;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import webSocketMessages.serverMessages.*;
 import webSocketMessages.userCommands.*;
@@ -45,7 +46,7 @@ public class WebSocketFacade extends Endpoint {
             var action = new JoinPlayer(this.authToken, gameID, color);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (Exception e) {
-            throw new Exception("Error: problem joining game via WebSocket");
+            throw new Exception("Error: problem joining game via WebSocket.");
         }
     }
 
@@ -54,7 +55,16 @@ public class WebSocketFacade extends Endpoint {
             var action = new JoinObserver(this.authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (Exception e) {
-            throw new Exception("Error: problem observing game via WebSocket");
+            throw new Exception("Error: problem observing game via WebSocket.");
+        }
+    }
+
+    public void makeMove(int gameID, ChessMove move) throws Exception {
+        try {
+            var action = new MakeMove(this.authToken, gameID, move);
+            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+        } catch (Exception e) {
+            throw new Exception("Error: problem making move via WebSocket.");
         }
     }
 

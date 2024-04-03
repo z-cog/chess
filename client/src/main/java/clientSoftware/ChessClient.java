@@ -176,7 +176,7 @@ public class ChessClient implements ServerMessageHandler {
                 }
             }
             var move = new ChessMove(start, end, promotionPiece);
-            
+            ws.makeMove(this.gameID, move);
             return "";
         }
         throw new Exception("Expected: move <startPosition> <endPosition> <promotionPiece>\n" +

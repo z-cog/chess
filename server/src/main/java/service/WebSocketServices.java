@@ -35,4 +35,8 @@ public class WebSocketServices {
         return currentGame;
     }
 
+    public void updateGame(ChessGame game, GameData data) throws DataAccessException {
+        GameData updatedGameData = new GameData(data.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName(), game);
+        games.updateGame(updatedGameData);
+    }
 }
