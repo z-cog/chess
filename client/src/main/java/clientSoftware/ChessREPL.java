@@ -12,6 +12,7 @@ public class ChessREPL {
     }
 
     public void run() {
+        System.out.print(RESET_BG_COLOR);
         System.out.print(SET_TEXT_COLOR_BLUE);
         System.out.println("Welcome to the Chess Client!");
 

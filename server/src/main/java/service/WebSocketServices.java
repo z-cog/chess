@@ -5,6 +5,7 @@ import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
 import dataAccess.UserDAO;
+import model.GameData;
 
 public class WebSocketServices {
     private final AuthDAO auth;
@@ -25,9 +26,9 @@ public class WebSocketServices {
         return authData.username();
     }
 
-    public ChessGame getGame(int gameID) throws DataAccessException, BadRequestException {
+    public GameData getGameData(int gameID) throws DataAccessException, BadRequestException {
         var gamesCollection = games.getGame(gameID);
-        var currentGame = (ChessGame) gamesCollection.toArray()[0];
+        var currentGame = (GameData) gamesCollection.toArray()[0];
         if (currentGame == null) {
             throw new BadRequestException("Error: specified game does not exist.");
         }

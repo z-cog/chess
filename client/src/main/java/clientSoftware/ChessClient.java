@@ -6,9 +6,7 @@ import clientSoftware.webSocket.ServerMessageHandler;
 import clientSoftware.webSocket.WebSocketFacade;
 import model.GameData;
 import ui.ChessUI;
-import webSocketMessages.serverMessages.LoadGame;
-import webSocketMessages.serverMessages.ServerMessage;
-import webSocketMessages.serverMessages.ServerNotification;
+import webSocketMessages.serverMessages.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -231,12 +229,10 @@ public class ChessClient implements ServerMessageHandler {
             ChessGame game = ((LoadGame) message).getGame();
             this.currentGame = game;
             ChessUI.printBoard(game.getBoard(), color);
+        } else if (type == ServerMessage.ServerMessageType.NOTIFICATION) {
+            System.out.println(SET_TEXT_COLOR_WHITE + ((ServerNotification) message).getMessage());
         } else {
-            var messageColor = SET_TEXT_COLOR_WHITE;
-            if (type == ServerMessage.ServerMessageType.ERROR) {
-                messageColor = SET_TEXT_COLOR_RED;
-            }
-            System.out.println(messageColor + ((ServerNotification) message).getMessage());
+            System.out.println(SET_TEXT_COLOR_RED + ((ServerErrorNotification) message).getMessage());
         }
         System.out.print(RESET_BG_COLOR);
         System.out.print(SET_TEXT_COLOR_GREEN);

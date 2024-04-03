@@ -2,7 +2,6 @@ package server.WebSocket;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 
@@ -11,6 +10,8 @@ import webSocketMessages.userCommands.*;
 import webSocketMessages.serverMessages.*;
 
 import org.eclipse.jetty.websocket.api.Session;
+
+import java.util.Objects;
 
 @WebSocket
 public class WebSocketHandler {
@@ -36,15 +37,28 @@ public class WebSocketHandler {
         cm.add(gameID, authToken, session);
         try {
             String username = service.authToUser(authToken);
-            ChessGame game = service.getGame(gameID);
+            var gameData = service.getGameData(gameID);
 
-            var message = new LoadGame(game);
-            cm.notifyRoot(gameID, authToken, message);
+            String colorUsername;
+            if (cmd.getPlayerColor() == ChessGame.TeamColor.WHITE) {
+                colorUsername = gameData.whiteUsername();
+            } else {
+                colorUsername = gameData.blackUsername();
+            }
 
-            var notification = new ServerNotification(ServerMessage.ServerMessageType.NOTIFICATION, " joined as " + cmd.getPlayerColor() + ".");
-            cm.broadcast(gameID, null, notification);
+            if (Objects.equals(colorUsername, username)) {
+                var message = new LoadGame(gameData.game());
+                cm.notifyRoot(gameID, authToken, message);
+
+                var notification = new ServerNotification(username + " joined as " + cmd.getPlayerColor() + ".");
+                cm.broadcast(gameID, authToken, notification);
+
+            } else {
+                var error = new ServerErrorNotification("Error: color reserved.");
+                cm.notifyRoot(gameID, authToken, error);
+            }
         } catch (Exception e) {
-            var message = new ServerNotification(ServerMessage.ServerMessageType.ERROR, e.getMessage());
+            var message = new ServerErrorNotification("Error:" + e.getMessage());
             cm.notifyRoot(gameID, authToken, message);
         }
     }
