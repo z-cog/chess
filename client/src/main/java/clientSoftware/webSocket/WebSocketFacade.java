@@ -78,6 +78,15 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
+    public void resignGame(int gameID) throws Exception {
+        try {
+            var action = new Resign(authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+        } catch (Exception e) {
+            throw new Exception("Error: problem resigning via WebSocket.");
+        }
+    }
+
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }

@@ -21,7 +21,7 @@ public class Server {
             games = new SQLGameDAO();
             user = new SQLUserDAO();
             service = new ServicesDaemon(auth, games, user);
-            ws = new WebSocketHandler(new WebSocketServices(auth, games, user));
+            ws = new WebSocketHandler(new WebSocketServices(auth, games));
         } catch (Exception e) {
             System.out.println("Error: Server failed to comple" + e.getMessage());
         }
@@ -33,7 +33,7 @@ public class Server {
         Spark.staticFiles.location("web");
 
         Spark.webSocket("/connect", ws);
-        
+
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);

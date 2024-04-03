@@ -19,7 +19,7 @@ import static ui.EscapeSequences.*;
 public class ChessClient implements ServerMessageHandler {
     private final ServerFacade facade;
     private WebSocketFacade ws;
-    private String url;
+    private final String url;
     private State state;
     private ChessGame.TeamColor color;
     private ChessGame currentGame;
@@ -166,23 +166,28 @@ public class ChessClient implements ServerMessageHandler {
         if ((params.length == 2 || params.length == 3) && params[0].length() == 2 && params[1].length() == 2) {
             var start = convertToPosition(params[0]);
             var end = convertToPosition(params[1]);
-            ChessPiece.PieceType promotionPiece = null;
-
-            if (params.length == 3) {
-                switch (params[2]) {
-                    case "queen" -> promotionPiece = ChessPiece.PieceType.QUEEN;
-                    case "knight" -> promotionPiece = ChessPiece.PieceType.KNIGHT;
-                    case "rook" -> promotionPiece = ChessPiece.PieceType.ROOK;
-                    case "bishop" -> promotionPiece = ChessPiece.PieceType.BISHOP;
-                }
-            }
-            var move = new ChessMove(start, end, promotionPiece);
+            var move = getChessMove(params, start, end);
             ws.makeMove(this.gameID, move);
             return "";
         }
-        throw new Exception("Expected: move <startPosition> <endPosition> <promotionPiece>\n" +
-                "Where: promotionPiece = queen|knight|bishop|rook|none\n" +
-                "       default: none.");
+        throw new Exception("""
+                Expected: move <startPosition> <endPosition> <promotionPiece>
+                Where: promotionPiece = queen|knight|bishop|rook|none
+                       default: none.""");
+    }
+
+    private static ChessMove getChessMove(String[] params, ChessPosition start, ChessPosition end) {
+        ChessPiece.PieceType promotionPiece = null;
+
+        if (params.length == 3) {
+            switch (params[2]) {
+                case "queen" -> promotionPiece = ChessPiece.PieceType.QUEEN;
+                case "knight" -> promotionPiece = ChessPiece.PieceType.KNIGHT;
+                case "rook" -> promotionPiece = ChessPiece.PieceType.ROOK;
+                case "bishop" -> promotionPiece = ChessPiece.PieceType.BISHOP;
+            }
+        }
+        return new ChessMove(start, end, promotionPiece);
     }
 
     private String leaveGame() throws Exception {
@@ -195,7 +200,8 @@ public class ChessClient implements ServerMessageHandler {
         return "Disconnected from websocket";
     }
 
-    private String resignGame() {
+    private String resignGame() throws Exception {
+        ws.resignGame(gameID);
         return "";
     }
 

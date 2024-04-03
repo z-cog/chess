@@ -10,12 +10,10 @@ import model.GameData;
 public class WebSocketServices {
     private final AuthDAO auth;
     private final GameDAO games;
-    private final UserDAO user;
 
-    public WebSocketServices(AuthDAO auth, GameDAO games, UserDAO user) {
+    public WebSocketServices(AuthDAO auth, GameDAO games) {
         this.auth = auth;
         this.games = games;
-        this.user = user;
     }
 
     public String authToUser(String authToken) throws DataAccessException, UnauthorizedUserException {
