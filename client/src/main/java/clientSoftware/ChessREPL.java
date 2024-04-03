@@ -20,6 +20,7 @@ public class ChessREPL {
         var result = "";
 
         while (!result.equals("quit")) {
+            System.out.print(RESET_BG_COLOR);
             System.out.print(SET_TEXT_COLOR_GREEN);
             System.out.print(">>> ");
 

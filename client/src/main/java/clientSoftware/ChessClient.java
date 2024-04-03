@@ -225,6 +225,7 @@ public class ChessClient implements ServerMessageHandler {
     }
 
     public void notify(ServerMessage message) {
+        System.out.println();
         var type = message.getServerMessageType();
         if (type == ServerMessage.ServerMessageType.LOAD_GAME) {
             ChessGame game = ((LoadGame) message).getGame();
@@ -237,5 +238,8 @@ public class ChessClient implements ServerMessageHandler {
             }
             System.out.println(messageColor + ((ServerNotification) message).getMessage());
         }
+        System.out.print(RESET_BG_COLOR);
+        System.out.print(SET_TEXT_COLOR_GREEN);
+        System.out.print(">>> ");
     }
 }

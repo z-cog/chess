@@ -1,5 +1,6 @@
 package server.WebSocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
@@ -31,7 +32,9 @@ public class WebSocketHandler {
 
     private void joinPlayer(Session session, JoinPlayer cmd) throws Exception {
         cm.add(cmd.getGameID(), cmd.getAuthString(), session);
-        var message = new ServerNotification(ServerMessage.ServerMessageType.NOTIFICATION, "Yoo mr white");
+        ChessGame game = new ChessGame();
+        game.getBoard().resetBoard();
+        var message = new LoadGame(game);
         cm.broadcast(cmd.getGameID(), null, message);
     }
 
