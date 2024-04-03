@@ -2,7 +2,7 @@ package clientSoftware.webSocket;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import webSocketMessages.serverMessages.ServerMessage;
+import webSocketMessages.serverMessages.*;
 import webSocketMessages.userCommands.*;
 
 import javax.websocket.*;
@@ -28,7 +28,10 @@ public class WebSocketFacade extends Endpoint {
                 @Override
                 public void onMessage(String message) {
                     ServerMessage response = new Gson().fromJson(message, ServerMessage.class);
-                    client.notify(response);
+                    switch (response.getServerMessageType()) {
+                        case LOAD_GAME -> client.notify(new Gson().fromJson(message, LoadGame.class));
+                        default -> client.notify(new Gson().fromJson(message, ServerNotification.class));
+                    }
                 }
             });
         } catch (Exception e) {
