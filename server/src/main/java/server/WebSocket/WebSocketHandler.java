@@ -147,15 +147,17 @@ public class WebSocketHandler {
         try {
             String username = service.authToUser(authToken);
             var gameData = service.getGameData(gameID);
+
             if (Objects.equals(username, gameData.whiteUsername())) {
                 service.updateGame(gameData, gameData.game(), "", gameData.blackUsername());
             } else if (Objects.equals(username, gameData.blackUsername())) {
                 service.updateGame(gameData, gameData.game(), gameData.whiteUsername(), "");
             }
+
             cm.remove(gameID, authToken);
 
             var message = new ServerNotification(username + " left the game.");
-            cm.broadcast(gameID, null, message);
+            cm.broadcast(gameID, authToken, message);
 
         } catch (Exception e) {
             var message = new ServerErrorNotification("Error:" + e.getMessage() + "\n somehow the code failed to close a websocket connection,\nwhich is really funny not gonna lie.");

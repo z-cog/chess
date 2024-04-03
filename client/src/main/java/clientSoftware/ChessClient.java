@@ -139,6 +139,7 @@ public class ChessClient implements ServerMessageHandler {
             var gameID = games.get(Integer.parseInt(params[0])).gameID();
             String output = facade.joinGame(null, gameID);
             this.color = ChessGame.TeamColor.WHITE;
+            this.gameID = gameID;
             this.ws = new WebSocketFacade(this.url, facade.authToken, this);
             ws.joinObserver(gameID);
             this.state = State.GAMEPLAY;
