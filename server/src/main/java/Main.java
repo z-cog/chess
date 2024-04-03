@@ -1,11 +1,6 @@
 import server.Server;
-import server.WebSocket.Connection;
-import server.WebSocket.ConnectionManager;
 
-import javax.websocket.Session;
-import java.util.HashMap;
 import java.util.Scanner;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Main {
     public static void main(String[] args) {
