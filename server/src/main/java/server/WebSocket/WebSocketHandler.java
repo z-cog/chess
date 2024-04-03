@@ -31,11 +31,21 @@ public class WebSocketHandler {
     }
 
     private void joinPlayer(Session session, JoinPlayer cmd) throws Exception {
-        cm.add(cmd.getGameID(), cmd.getAuthString(), session);
-        ChessGame game = new ChessGame();
-        game.getBoard().resetBoard();
-        var message = new LoadGame(game);
-        cm.broadcast(cmd.getGameID(), null, message);
+        int gameID = cmd.getGameID();
+        String authToken = cmd.getAuthString();
+        cm.add(gameID, authToken, session);
+        try {
+            ChessGame game = new ChessGame();
+            game.getBoard().resetBoard();
+            var message = new LoadGame(game);
+            cm.notifyRoot(gameID, authToken, message);
+
+            var notification = new ServerNotification(ServerMessage.ServerMessageType.NOTIFICATION, " joined as ");
+            cm.broadcast(gameID, null, notification);
+        } catch (Exception e) {
+            var message = new ServerNotification(ServerMessage.ServerMessageType.ERROR, e.getMessage());
+            cm.notifyRoot(gameID, authToken, message);
+        }
     }
 
 }

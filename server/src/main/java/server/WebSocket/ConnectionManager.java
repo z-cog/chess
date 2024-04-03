@@ -41,4 +41,14 @@ public class ConnectionManager {
             currentIDConnection.remove(c.authToken);
         }
     }
+
+    public void notifyRoot(int gameID, String authToken, ServerMessage message) throws Exception {
+        var connection = connections.get(gameID).get(authToken);
+        if (connection.session.isOpen()) {
+            connection.send(message.toString());
+        } else {
+            connections.get(gameID).remove(authToken);
+        }
+    }
+
 }
