@@ -35,12 +35,13 @@ public class WebSocketHandler {
         String authToken = cmd.getAuthString();
         cm.add(gameID, authToken, session);
         try {
-            ChessGame game = new ChessGame();
-            game.getBoard().resetBoard();
+            String username = service.authToUser(authToken);
+            ChessGame game = service.getGame(gameID);
+
             var message = new LoadGame(game);
             cm.notifyRoot(gameID, authToken, message);
 
-            var notification = new ServerNotification(ServerMessage.ServerMessageType.NOTIFICATION, " joined as ");
+            var notification = new ServerNotification(ServerMessage.ServerMessageType.NOTIFICATION, " joined as " + cmd.getPlayerColor() + ".");
             cm.broadcast(gameID, null, notification);
         } catch (Exception e) {
             var message = new ServerNotification(ServerMessage.ServerMessageType.ERROR, e.getMessage());
