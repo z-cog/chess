@@ -87,7 +87,7 @@ public class ServerFacade {
     }
 
     public Object[] listGames() throws Exception {
-        record listGameResponse(GameData[] games) {
+        record ListGameResponse(GameData[] games) {
         }
         URI uri = new URI(url + "/game");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
@@ -101,7 +101,7 @@ public class ServerFacade {
 
         try (InputStream respBody = http.getInputStream()) {
             InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-            var gameList = new Gson().fromJson(inputStreamReader, listGameResponse.class);
+            var gameList = new Gson().fromJson(inputStreamReader, ListGameResponse.class);
             return gameList.games();
         }
     }
